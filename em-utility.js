@@ -49,11 +49,12 @@ function BinToDex(b){
  * @return {String}
  */
 function DexToFillBin(d,count){
+    console.log(d);
     if(typeof d == "string"){
         d = parseInt(d,10);
     }
     var b = d.toString(2);
-    
+
     var length = b.length;
     if (length>count){
         b = b.substring(0,count);
@@ -81,9 +82,9 @@ function ComplementBinToDex(b){
 }
 
 /**
- * Converts decimal number d into binary code. The length of binary code is count. 
+ * Converts decimal number d into binary code. The length of binary code is count.
  * If d is negative result will be represented in two's complement.
- * 
+ *
  * @param {Number} d
  * @param {Number} count
  * @return {String}
@@ -174,17 +175,22 @@ function HexToFillHex(h, count){ //test
  * @return {string}
  */
 function BinToHex(b) {
-    var h = "";
+    return parseInt(b,2).toString(16);
+    /*var h = "";
 
-    if(b.length % 4 !== 0){
-        b = generateString(4 - b.length % 4, '0') + b;
-    }
-    var length = b.length;
+     if(b.length % 4 !== 0){
+     b = generateString(4 - b.length % 4, '0') + b;
+     }
+     var length = b.length;
 
-    for(var i=0; i<length; i+=4){
-        var bslice = b.slice(length-4-i, length-i);
-        var d = BinToDex(bslice);
-        h = DexToHex(d) + h;
-    }
-    return h;
+     for(var i=0; i<length; i+=4){
+     var bslice = b.slice(length-4-i, length-i);
+     var d = BinToDex(bslice);
+     h = DexToHex(d) + h;
+     }
+     return h;*/
+}
+
+function test(b){
+
 }

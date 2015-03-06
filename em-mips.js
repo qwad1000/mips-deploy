@@ -100,6 +100,10 @@ function initCommandRamHolder() {
         console.log(this.commandCodeList.length+" з міткою "+label);
         this.labels[label] = this.commandCodeList.length - 1;
     };
+    commandRamHolder.setLabel = function (label,number){
+        console.log(this.commandCodeList.length+" з міткою "+label+" та порядковим номером" + number);
+        this.labels[label] = number;
+    };
     commandRamHolder.getLabel = function (label) {
         console.log("Знаходимо мітку " + label);
         return this.labels[label];
@@ -218,6 +222,7 @@ function convertTSImm(splitedCode) {
 }
 //DSTGroup = ['add','addu','and','or','sllv','slt','sltu','srlv','sub','subu','xor']
 function convertDST(splitedCode) {
+    console.log(splitedCode);
     return DexToFillBin(getRegisterCode(splitedCode[2]), 5)
         + DexToFillBin(getRegisterCode(splitedCode[3]), 5)
         + DexToFillBin(getRegisterCode(splitedCode[1]), 5);
@@ -246,7 +251,7 @@ function convertTarget(splitedCode) {
 //TOffSGroup = ['lw','sw','lb','sb']
 function convertTOffS(splitedCode) {
     var offS = splitedCode[2];
-    var offSArr = offS.split("("); 
+    var offSArr = offS.split("(");
     offSArr[1] = offSArr[1].substring(0, offSArr[1].length - 1);
     return DexToFillBin(getRegisterCode(offSArr[1]), 5)
         + DexToFillBin(getRegisterCode(splitedCode[1]), 5)
@@ -274,7 +279,7 @@ var numberRegExp = new RegExp("^-?(0x[0-9A-F]+|[0-9]+)");
 
 /*commandTSImmGroup = ['addi','addiu','andi','ori','slti','sltiu','xori'];
  commandDSTGroup = ['add','addu','and','or','sllv','slt','sltu','srlv',
-                    'sub','subu','xor'];
+ 'sub','subu','xor'];
  commandSOffGroup = ['bgez','bgezal','bgtz','blez','bltz','bltzal'];
  commandSTGroup = ['div','divu','mult','multu'];
  commandSTOffGroup = ['beq','bne'];
@@ -289,25 +294,26 @@ function initCommandParser() {
     commandParser.commandHolder = initCommandRamHolder();
     commandParser.createCommand = function (code) {
         console.log(code);
-        if (code.indexOf(':')>-1) {
-            var labelWithCode = code.split(':');
-            code = labelWithCode[1].trim();
-            var label = labelWithCode[0].trim();
-            this.commandHolder.addLabel(label);
-            console.log("add label " + label);
-            if (code.length < 2) {
-                return
-            }
-        }
+        /*if (code.indexOf(':')>-1) {
+         var labelWithCode = code.split(':');
+         code = labelWithCode[1].trim();
+         var label = labelWithCode[0].trim();
+         this.commandHolder.addLabel(label);
+         console.log("add label " + label);
+         if (code.length < 2) {
+         return
+         }
+         }*/
         /*splitedCode = splitedCode.filter(function (element) {
-            var b = true;
-            if (element.length < 2) {
-                if (numberSet.indexOf(parseInt(element)) == -1) {
-                    b = false;
-                }
-            }
-            return b;
-        });*/
+         var b = true;
+         if (element.length < 2) {
+         if (numberSet.indexOf(parseInt(element)) == -1) {
+         b = false;
+         }
+         }
+         return b;
+         });*/
+        console.log(code);
         return code.split(commandRegExp);
     };
     commandParser.parse = function (splitedCode) {
@@ -345,7 +351,7 @@ function initCommandParser() {
             case 'bltz':
             case 'bltzal':
                 var offsetLabel = splitedCode[2];
-                if (!numberRegExp.test(offset)) {
+                if (!numberRegExp.test(offsetLabel)) {
                     var currentCommandNumber = this.commandHolder.commandCodeList.length;
                     var labelNumber = this.commandHolder.getLabel(offsetLabel);
                     var offset = labelNumber - currentCommandNumber;
@@ -364,7 +370,7 @@ function initCommandParser() {
             case 'beq':
             case 'bne':
                 offsetLabel = splitedCode[3];
-                if (!numberRegExp.test(offset)) {
+                if (!numberRegExp.test(offsetLabel)) {
                     currentCommandNumber = this.commandHolder.commandCodeList.length;
                     labelNumber = this.commandHolder.getLabel(offsetLabel);
                     offset = labelNumber - currentCommandNumber;
@@ -500,7 +506,7 @@ function initZeroStartArray() {
             registerHolder.get(values[1]) + registerHolder.get(values[2]));
     };
     //addu
-    arr["100001"] = function (b, registerHolder) { //fixme unsigned no overflow
+    arr["100001"] = function (b, registerHolder) {
         var values = getDST(b);
         registerHolder.set(values[0],
             registerHolder.get(values[1]) + registerHolder.get(values[2]));
@@ -578,11 +584,14 @@ function initAccArray() {
         var values = getST(b);
         var s = registerHolder.get(values[0]);
         var t = registerHolder.get(values[1]);
-        var mult = DexToFillBin(s * t, 64);
+        console.log(s,t);
+        var mult = DexToFillComplementBin(s * t, 64);
         var mult1 = mult.substring(0, 32);
         var mult2 = mult.substring(32);
         alu.lo = BinToDex(mult2);
-        alu.hi = BinToDex(mult1);   //fixme: negative values
+        alu.hi = BinToDex(mult1);
+        console.log(alu.lo);
+        console.log("Множення");
     };
     //multu
     arr['011010'] = function (b, registerHolder, alu) {
@@ -593,7 +602,7 @@ function initAccArray() {
         var mult1 = mult.substring(0, 32);
         var mult2 = mult.substring(32);
         alu.lo = BinToDex(mult2);
-        alu.hi = BinToDex(mult1); //fixme: negative values
+        alu.hi = BinToDex(mult1);
     };
 
     return arr;
@@ -648,11 +657,11 @@ function initHardArray() {
     };
     //sw
     arr['101011'] = function (b,registerHolder, ramHolder, commandRamHolder){
-          var values = getTOffS(b);
-          ramHolder.setDexWord(values[2]+registerHolder.get(values[1]),
+        var values = getTOffS(b);
+        ramHolder.setDexWord(values[2]+registerHolder.get(values[1]),
             registerHolder.get(values[0]));
-          /*ramHolder.setDex(registerHolder.get(values[0])+values[2], 
-            registerHolder.get(values[1]));*/
+        /*ramHolder.setDex(registerHolder.get(values[0])+values[2],
+         registerHolder.get(values[1]));*/
     };
     //lw
     arr['100011'] = function (b,registerHolder, ramHolder, commandRamHolder) {
@@ -726,7 +735,7 @@ function initHardArray() {
  * @returns {Number} target
  */
 function getTarget(b){
-   return BinToDex(b.substring(6));
+    return BinToDex(b.substring(6));
 }
 
 /**
@@ -769,6 +778,182 @@ function getST(b) {
  */
 function getSTImm(b) {
     return [BinToDex(b.substring(6, 11)), BinToDex(b.substring(11, 16)), ComplementBinToDex(b.substring(16))];
+}
+
+//endregion
+
+
+
+//region Верифікація
+function verificate(line,commandRamHolder){
+    if (line.indexOf(":") > -1){
+        line = line.split(":")[1];
+    }
+    var splitedCode = line.split(" ");
+    var code = splitedCode[0];
+    switch (code) {
+        //TImm Group
+        case 'addi':
+        case 'addiu':
+        case 'andi':
+        case 'ori':
+        case 'slti':
+        case 'sltiu':
+        case 'xori':
+            return verifyTSImm(splitedCode);
+            break;
+        //DST Group
+        case 'add':
+        case 'addu':
+        case 'and':
+        case 'or':
+        case 'sllv':
+        case 'slt':
+        case 'sltu':
+        case 'srlv':
+        case 'sub':
+        case 'subu':
+        case 'xor':
+            return verifyDST(splitedCode);
+            break;
+        //SOff Group
+        case 'bgez':
+        case 'bgezal':
+        case 'bgtz':
+        case 'blez':
+        case 'bltz':
+        case 'bltzal':
+            return verifySOff(splitedCode,commandRamHolder);
+            break;
+        //ST Group
+        case 'div':
+        case 'divu':
+        case 'mult':
+        case 'multu':
+            return verifyST(splitedCode);
+            break;
+        //STOff Group
+        case 'beq':
+        case 'bne':
+            return verifySTOff(splitedCode,commandRamHolder);
+            break;
+        //Target Group
+        case 'j':
+        case 'jal':
+            return verifyTarget(splitedCode,commandRamHolder);
+            break;
+        //TOffS Group
+        case 'lw':
+        case 'sw':
+        case 'lb':
+        case 'sb':
+            return verifyTOffS(splitedCode);
+            break;
+        //SorD Group
+        case 'mfhi':
+        case 'mflo':
+        case 'jr':
+            return verifySorD(splitedCode);
+            break;
+        //TImm Group
+        case 'lui':
+            return verifyTImm(splitedCode);
+            break;
+        //DTH Group
+        case 'sll':
+        case 'sra':
+        case 'srl':
+            return verifyDTH(splitedCode);
+            break;
+
+    }
+    return false;
+}
+
+function _isImmNumber(n){
+    return !isNaN(n) && (n<16385 && n> - 16385);
+}
+
+function _isSmallImmNumber(n){
+    return !isNaN(n) && (n<16 && n> - 16);
+}
+
+function _isBigImmNumber(n){
+    return !isNaN(n) && (n<16777216 && n> -16777216);
+}
+
+function _isLabel(n,commandRamHolder){
+    if (typeof n == "string"){
+        return commandRamHolder.getLabel(n)!=undefined;
+    }
+    return _isImmNumber(n);
+}
+
+function _isBigLabel(n,commandRamHolder){
+    if (typeof n == "string"){
+        return commandRamHolder.getLabel(n)!=undefined;
+    }
+    return _isBigImmNumber(n);
+}
+
+//TSImmGroup = ['addi','addiu','andi','ori','slti','sltiu','xori']
+function verifyTSImm(splitedCode) {
+    var imm = parseInt(splitedCode[3]);
+    return getRegisterCode(splitedCode[2]) != undefined &&
+        getRegisterCode(splitedCode[1]) != undefined &&
+        _isImmNumber(imm);
+}
+//DSTGroup = ['add','addu','and','or','sllv','slt','sltu','srlv','sub','subu','xor']
+function verifyDST(splitedCode) {
+    return getRegisterCode(splitedCode[2]) != undefined &&
+        getRegisterCode(splitedCode[3]) != undefined &&
+        getRegisterCode(splitedCode[1]) != undefined;
+}
+//SOffGroup = ['bgez','bgezal','bgtz','blez','bltz','bltzal']
+function verifySOff(splitedCode,commandRamHolder) {
+    return getRegisterCode(splitedCode[1]) != undefined &&
+        + _isLabel(splitedCode[2],commandRamHolder);
+}
+//STGroup = ['div','divu','mult','multu']
+function verifyST(splitedCode) {
+    return getRegisterCode(splitedCode[1]) != undefined &&
+        getRegisterCode(splitedCode[2]) != undefined;
+}
+//STOffGroup = ['beq','bne']
+function verifySTOff(splitedCode,commandRamHolder) {
+    return getRegisterCode(splitedCode[1]) != undefined &&
+        + getRegisterCode(splitedCode[2]) != undefined &&
+        + _isLabel(splitedCode[3],commandRamHolder);
+}
+
+//TargetGroup=['j','jal']
+function verifyTarget(splitedCode,commandRamHolder) {
+    return _isBigLabel(splitedCode[1],commandRamHolder);
+}
+
+//TOffSGroup = ['lw','sw','lb','sb']
+function verifyTOffS(splitedCode) {
+    var offS = splitedCode[2];
+    var offSArr = offS.split("(");
+    offSArr[1] = offSArr[1].substring(0, offSArr[1].length - 1);
+    return getRegisterCode(offSArr[1]) != undefined &&
+        getRegisterCode(splitedCode[1]) != undefined &&
+        _isImmNumber(offSArr[0]);
+}
+//SorDGroup = ['mfhi','mflo','jr']
+function verifySorD(splitedCode) {
+    return getRegisterCode(splitedCode[1]) != undefined;
+}
+//TImmGroup = ['lui']
+function verifyTImm(splitedCode) {
+    return getRegisterCode(splitedCode[1]) != undefined &&
+        + _isImmNumber(splitedCode[2]);
+}
+//commandDTHGroup = ['sll','sra','srl']
+function verifyDTH(splitedCode) {
+    return getRegisterCode(splitedCode[2]) != undefined&&
+        getRegisterCode(splitedCode[1]) != undefined &&
+        _isSmallImmNumber(splitedCode[3]);
 }
 
 //endregion
