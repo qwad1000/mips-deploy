@@ -12,53 +12,7 @@ app.config(function($interpolateProvider) {
 
 var someEDXFounder = {};
 
-someEDXFounder.getState = function () {
-    var jsonObject = {
-        "code":editor.getValue(),
-        "exVar": exerciseVar.toString(),
-        "exPath": exercisePath
-    };
-    return JSON.stringify(jsonObject);
-};
 
-someEDXFounder.setState = function (jsonCode){
-    var result = JSON.parse(jsonCode);
-    editor.setValue(result["code"]);
-    exerciseVar = parseInt(result["exVar"]);
-    exercisePath = result["exPath"];
-    console.log(exerciseVar);
-    console.log(exercisePath);
-
-    $http.get(exercisePath)
-        .success( function (response) {
-            $scope.exercise = response[exerciseVar];
-        }).error( function () {
-            $scope.resultArea += "Some error loading tests from" + exercisePath + "var:" + exerciseVar;
-            $scope.exercise = initialObject;
-        });
-};
-
-someEDXFounder.gradeFunction = function () {
-    console.log($scope.exercise.tests);
-    var count = $scope.exercise.tests.length;
-    var goodCount = 0;
-    for (var id=0;id<count;id++){
-        var test = $scope.exercise.tests[id];
-        console.log(test.passed);
-        if (test.passed != false){
-            $scope.testClick(id);
-        }
-        if (test.passed == true){
-            goodCount = goodCount + 1;
-        }
-    }
-    var jsonResult = {
-        "count": count,
-        "goodCount":goodCount
-    };
-    console.log(jsonResult);
-    return JSON.stringify(jsonResult);
-};
 
 
 var exerciseVar = 0;
@@ -101,6 +55,54 @@ app.controller ("testController", function($scope, $http) {
             //$scope.exercise = initialObject;
         });
 
+
+	someEDXFounder.getState = function () {
+	    var jsonObject = {
+	        "code":editor.getValue(),
+	        "exVar": exerciseVar.toString(),
+	        "exPath": exercisePath
+	    };
+	    return JSON.stringify(jsonObject);
+	};
+
+	someEDXFounder.setState = function (jsonCode){
+	    var result = JSON.parse(jsonCode);
+	    editor.setValue(result["code"]);
+	    exerciseVar = parseInt(result["exVar"]);
+	    exercisePath = result["exPath"];
+	    console.log(exerciseVar);
+	    console.log(exercisePath);
+
+	    $http.get(exercisePath)
+	        .success( function (response) {
+	            $scope.exercise = response[exerciseVar];
+	        }).error( function () {
+	            $scope.resultArea += "Some error loading tests from" + exercisePath + "var:" + exerciseVar;
+	            $scope.exercise = initialObject;
+	        });
+	};
+
+	someEDXFounder.gradeFunction = function () {
+	    console.log($scope.exercise.tests);
+	    var count = $scope.exercise.tests.length;
+	    var goodCount = 0;
+	    for (var id=0;id<count;id++){
+	        var test = $scope.exercise.tests[id];
+	        console.log(test.passed);
+	        if (test.passed != false){
+	            $scope.testClick(id);
+	        }
+	        if (test.passed == true){
+	            goodCount = goodCount + 1;
+	        }
+	    }
+	    var jsonResult = {
+	        "count": count,
+	        "goodCount":goodCount
+	    };
+	    console.log(jsonResult);
+	    return JSON.stringify(jsonResult);
+	};
 
 
     function prepareRegistersTable(columns, arr, names){
