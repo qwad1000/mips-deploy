@@ -1,4 +1,6 @@
 <body>
+<meta charset="utf-8">
+
 <div ng-app="MIPS-app" ng-controller="testController">
     <div class="page-wrapper container-fluid">
         <div class="row main-part-wrapper no-gutters">
@@ -77,16 +79,20 @@
 
                             <tr ng-repeat="row in dividedRegisters track by $index">
                                 <td class="register-name-cell" >r[$ row[0].indx $]/[$ row[0].name $]</td>
-                                <td class="register-value-cell">[$ returnRegister(row[0].indx, hexRegFmt) $]</td>
+                                <td id="[$'mips-register-r'+row[0].indx$]"
+                                        class="register-value-cell">[$ returnRegister(row[0].indx, hexRegFmt) $]</td>
                                 <td class="register-name-cell">r[$ row[1].indx $]/[$ row[1].name $]</td>
-                                <td class="register-value-cell">[$ returnRegister(row[1].indx, hexRegFmt) $]</td>
+                                <td id="[$'mips-register-r'+row[1].indx$]"
+                                    class="register-value-cell">[$ returnRegister(row[1].indx, hexRegFmt) $]</td>
                             </tr>
 
                             <tr>
                                 <td class="register-name-cell">alu.hi</td>
-                                <td class="register-value-cell"> [$ returnRegister('alu.hi', hexRegFmt) $]</td>
+                                <td id="mips-register-alu-hi"
+                                    class="register-value-cell"> [$ returnRegister('alu.hi', hexRegFmt) $]</td>
                                 <td class="register-name-cell">alu.lo</td>
-                                <td class="register-value-cell"> [$ returnRegister('alu.lo', hexRegFmt) $]</td>
+                                <td id="mips-register-alu-lo"
+                                    class="register-value-cell"> [$ returnRegister('alu.lo', hexRegFmt) $]</td>
                             </tr>
                         </tbody>
                     </table>

@@ -2,7 +2,9 @@ var app = angular.module("MIPS-app",[]);
 
 var editor = ace.edit("editor");
 editor.getSession().setMode("ace/mode/mips");
-editor.setValue("#Це просто кусок коментаря");
+editor.setValue("#Це просто кусок коментаря\n\
+addi $t1 $zero 20\n\
+addi $t3 $zero 39");
 editor.gotoLine(0);
 
 app.config(function($interpolateProvider) {
@@ -56,7 +58,7 @@ app.controller ("testController", function($scope, $http) {
 	someEDXFounder.getState = function () {
 	    var jsonObject = {
 	        "code":editor.getValue(),
-	        "exVar": $scope.exerciseVar.toString(),
+	        "exVar": $scope.exerciseVar,
 	        "exPath": $scope.exercisePath
 	    };
 	    return JSON.stringify(jsonObject);
@@ -216,7 +218,8 @@ app.controller ("testController", function($scope, $http) {
                     }
                 }
                 $scope.isEditing = false;
-                $scope.loadBtnText = "Return to code editor";
+                resetRegistersHighlighting();
+                $scope.loadBtnText = "Return to editor";
                 editor.setReadOnly(true);
                 $scope.resultArea = "";
             }
@@ -249,7 +252,20 @@ app.controller ("testController", function($scope, $http) {
 
     $scope.runStep = function () {
         if($scope.commandsCount>0){
+            var previousRegistersMap = angular.copy($scope.registers);
             demoCPU.nextCommand();
+
+            //$("#mips-register-r" + 15).css("background-color", "blue");
+            //$("#mips-register-r" + 15).addClass("danger");
+
+            for(var i=0; i<previousRegistersMap.length; i++){
+                if(previousRegistersMap[i] == $scope.registers[i]){
+                    $("#mips-register-r" + i).removeClass("danger");
+                }else{
+                    $("#mips-register-r" + i).addClass("danger");
+                }
+            }
+
             editor.session.clearBreakpoints();
             var rows = editor.session.getLength(); //fixme: indexes may be wrong if delete empty rows in editor
             editor.session.setBreakpoint(rows - $scope.commandsCount);
@@ -262,6 +278,9 @@ app.controller ("testController", function($scope, $http) {
         demoCPU = initDemoCPU();
         editor.session.clearBreakpoints();
         $scope.registers = demoCPU.register.registerMap;
+
+        resetRegistersHighlighting();
+
         //$scope.programCounter = demoCPU.commandParser.commandHolder.PC;
         $scope.ram = demoCPU.ram;
         $scope.isEditing = true; //crunch;
@@ -269,6 +288,12 @@ app.controller ("testController", function($scope, $http) {
         $scope.loadInfo();
         console.log('mips cpu reseted');
     };
+
+    function resetRegistersHighlighting(){
+        for(var i=0; i<$scope.registers.length; i++){
+            $("#mips-register-r" + i).removeClass("danger");
+        }
+    }
 
     $scope.testClick = function (id){
         $scope.reset();
