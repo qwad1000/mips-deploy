@@ -48,11 +48,11 @@
                                     <span class="glyphicon glyphicon-ok" ng-show="val.passed"></span>
                                     <span class="glyphicon glyphicon-remove" ng-hide="val.passed || val.passed == undefined"></span>
                                     [$val.title$]</button>
-                                </li>
-                            </ul>
-                        </div>
+                            </li>
+                        </ul>
                     </div>
                 </div>
+            </div>
             </div>
 
             <!-- registers table column -->
@@ -154,7 +154,7 @@
         </div>
 
         <div class="row">
-            <div class="col-sm-4"> Some </div>
+            <div class="col-sm-4"> [$exercise.task$] </div>
             <div class="col-sm-8">
                 <textarea class="result-area" ng-model="resultArea"></textarea>
             </div>

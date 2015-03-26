@@ -13,16 +13,10 @@ app.config(function($interpolateProvider) {
 var someEDXFounder = {};
 
 
-
-
-var exerciseVar = 0;
-var exercisePath = "vars1.json";
-
-
-
 function isNotCommentLine(line){
     return !line.startsWith("#");
 }
+
 
 app.controller ("testController", function($scope, $http) {
     var demoCPU = initDemoCPU();
@@ -36,6 +30,9 @@ app.controller ("testController", function($scope, $http) {
     $scope.loadBtnText = "Assemble & Load to CPU";
     $scope.limits = limits;
 
+    $scope.exerciseVar = 0;
+    $scope.exercisePath = "vars0.json";
+
 
     $scope.hexRegFmt = 'hex';
     $scope.memoryShift = 0x12;
@@ -46,12 +43,12 @@ app.controller ("testController", function($scope, $http) {
     $scope.memoryShifts = prepareMemoryTable($scope.memoryShift,memoryTableSize.height, memoryTableSize.width);
 
     //crunch
-    $http.get(exercisePath)
+    $http.get($scope.exercisePath)
         .success( function (response) {
             var variants = response.variants;
             $scope.exercise = variants[0];
         }).error( function () {
-            $scope.resultArea += "Some error loading tests from" + exercisePath + "var:" + exerciseVar;
+            $scope.resultArea += "Some error loading tests from" + $scope.exercisePath + "var:" + $scope.exerciseVar;
             //$scope.exercise = initialObject;
         });
 
@@ -59,8 +56,8 @@ app.controller ("testController", function($scope, $http) {
 	someEDXFounder.getState = function () {
 	    var jsonObject = {
 	        "code":editor.getValue(),
-	        "exVar": exerciseVar.toString(),
-	        "exPath": exercisePath
+	        "exVar": $scope.exerciseVar.toString(),
+	        "exPath": $scope.exercisePath
 	    };
 	    return JSON.stringify(jsonObject);
 	};
@@ -68,16 +65,18 @@ app.controller ("testController", function($scope, $http) {
 	someEDXFounder.setState = function (jsonCode){
 	    var result = JSON.parse(jsonCode);
 	    editor.setValue(result["code"]);
-	    exerciseVar = parseInt(result["exVar"]);
-	    exercisePath = result["exPath"];
-	    console.log(exerciseVar);
-	    console.log(exercisePath);
 
-	    $http.get(exercisePath)
+        $scope.exerciseVar = parseInt(result["exVar"]);
+	    $scope.exercisePath = result["exPath"];
+
+        console.log("variant:" + $scope.exerciseVar+ " from: " + $scope.exercisePath);
+
+	    $http.get($scope.exercisePath)
 	        .success( function (response) {
-	            $scope.exercise = response[exerciseVar];
+                var v = $scope.exerciseVar;
+	            $scope.exercise = response.variants[v];
 	        }).error( function () {
-	            $scope.resultArea += "Some error loading tests from" + exercisePath + "var:" + exerciseVar;
+	            $scope.resultArea += "Some error loading tests from" + $scope.exercisePath + "var:" + $scope.exerciseVar;
 	            $scope.exercise = initialObject;
 	        });
 	};
