@@ -3,8 +3,9 @@ var app = angular.module("MIPS-app",[]);
 var editor = ace.edit("editor");
 editor.getSession().setMode("ace/mode/mips");
 editor.setValue("#Це просто кусок коментаря\n\
-addi $t1 $zero 20\n\
-addi $t3 $zero 39");
+addi $t1,$zero,20 #Тестовий коментар\n\
+#Ще один дивний коментар. Він такий няшка!\n\
+addi $t3,$zero,39");
 editor.gotoLine(0);
 
 app.config(function($interpolateProvider) {
@@ -16,9 +17,16 @@ var someEDXFounder = {};
 
 
 function isNotCommentLine(line){
-    return !line.startsWith("#");
+    return !line.startsWith("#") && line.length>0;
 }
 
+function clearFromLineInComments(line){
+    var sharpIndex = line.indexOf("#");
+    if (sharpIndex>-1){
+        line = line.substring(0,sharpIndex).trim();
+    }
+    return line;
+}
 
 app.controller ("testController", function($scope, $http) {
     var demoCPU = initDemoCPU();
@@ -183,25 +191,38 @@ app.controller ("testController", function($scope, $http) {
     $scope.loadInfo = function (){
         if($scope.isEditing){
             $scope.codeArea = editor.getValue();
-            var operations_list = $scope.codeArea.split('\n').filter(isNotCommentLine);
+            var filtered_operations_list = $scope.codeArea.split('\n').filter(isNotCommentLine).map(clearFromLineInComments);
+            $scope.realCommandsCount = filtered_operations_list.length;
+            var operations_list = $scope.codeArea.split('\n');
             $scope.commandsCount = 0;
 
 
-
+            //Створення зв’язуючої мапи
+            $scope.bindMap = [];
+            var commandCounter = 0;
             for (var i=0;i<operations_list.length;i++){
-                var value = operations_list[i].trim();
-                if (value.indexOf(":")>-1){
-                    var splited = value.split(":");
-                    operations_list[i] = splited[1];
-                    demoCPU.commandParser.commandHolder.setLabel(splited[0],i-1);
+                if (isNotCommentLine(operations_list[i])){
+                    $scope.bindMap[commandCounter] = i;
+                    commandCounter++;
                 }
             }
 
+
+            for (i=0;i<filtered_operations_list.length;i++){
+                var value = filtered_operations_list[i].trim();
+                if (value.indexOf(":")>-1){
+                    var splited = value.split(":");
+                    filtered_operations_list[i] = splited[1];
+                    demoCPU.commandParser.commandHolder.setLabel(splited[0],i-1);
+                }
+            }
+            console.log($scope.bindMap);
             var isVerificated = true;
-            for (i=0;i<operations_list.length;i++){
-                value = operations_list[i].trim();
+            for (i=0;i<filtered_operations_list.length;i++){
+                value = filtered_operations_list[i].trim();
                 if (!verificate(value,demoCPU.commandParser.commandHolder)){
-                    alert("У вас помилка. Рядок №"+(i+1));
+                    alert("У вас помилка. Рядок №"+$scope.bindMap[i+1]);
+                    console.log(i+1);
                     demoCPU.commandParser.commandHolder.clear();
                     isVerificated = false;
                     break;
@@ -209,8 +230,8 @@ app.controller ("testController", function($scope, $http) {
             }
 
             if (isVerificated) {
-                for (i = 0; i < operations_list.length; i++) {
-                    value = operations_list[i].trim();
+                for (i = 0; i < filtered_operations_list.length; i++) {
+                    value = filtered_operations_list[i].trim();
                     if (value.length > 0) {
                         var binResult = demoCPU.command(value);
                         $scope.commandsCount++;
@@ -267,8 +288,8 @@ app.controller ("testController", function($scope, $http) {
             }
 
             editor.session.clearBreakpoints();
-            var rows = editor.session.getLength(); //fixme: indexes may be wrong if delete empty rows in editor
-            editor.session.setBreakpoint(rows - $scope.commandsCount);
+            //var rows = editor.session.getLength(); //fixme: indexes may be wrong if delete empty rows in editor
+            editor.session.setBreakpoint($scope.bindMap[$scope.realCommandsCount - $scope.commandsCount]);
             $scope.commandsCount--;
             console.log(demoCPU.commandParser.commandHolder.PC);
             //console.log($scope.programCounter);

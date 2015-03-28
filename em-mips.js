@@ -294,27 +294,12 @@ function initCommandParser() {
     commandParser.commandHolder = initCommandRamHolder();
     commandParser.createCommand = function (code) {
         console.log(code);
-        /*if (code.indexOf(':')>-1) {
-         var labelWithCode = code.split(':');
-         code = labelWithCode[1].trim();
-         var label = labelWithCode[0].trim();
-         this.commandHolder.addLabel(label);
-         console.log("add label " + label);
-         if (code.length < 2) {
-         return
-         }
-         }*/
-        /*splitedCode = splitedCode.filter(function (element) {
-         var b = true;
-         if (element.length < 2) {
-         if (numberSet.indexOf(parseInt(element)) == -1) {
-         b = false;
-         }
-         }
-         return b;
-         });*/
+        //Код команди виглядає так:
+        //addi $t1,$t2,$t3
+        var firstSpilt = code.split(" ");
+        var end = [firstSpilt[0]].concat(firstSpilt[1].split(commandRegExp));
         console.log(code);
-        return code.split(commandRegExp);
+        return end;
     };
     commandParser.parse = function (splitedCode) {
         var code = splitedCode[0];
@@ -789,7 +774,11 @@ function verificate(line,commandRamHolder){
     if (line.indexOf(":") > -1){
         line = line.split(":")[1];
     }
-    var splitedCode = line.split(commandRegExp);
+    var firstSplit = line.split(" ");
+    if (firstSplit.length!=2){
+        return false;
+    }
+    var splitedCode = [firstSplit[0]].concat(firstSplit[1].split(commandRegExp));
     var code = splitedCode[0];
     switch (code) {
         //TImm Group
