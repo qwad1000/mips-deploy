@@ -273,7 +273,7 @@ function convertDTH(splitedCode) {
         + DexToFillBin(splitedCode[3], 5);
 }
 
-var commandRegExp = new RegExp(" ");
+var commandRegExp = new RegExp(",");
 
 var numberRegExp = new RegExp("^-?(0x[0-9A-F]+|[0-9]+)");
 
@@ -789,7 +789,7 @@ function verificate(line,commandRamHolder){
     if (line.indexOf(":") > -1){
         line = line.split(":")[1];
     }
-    var splitedCode = line.split(" ");
+    var splitedCode = line.split(commandRegExp);
     var code = splitedCode[0];
     switch (code) {
         //TImm Group
