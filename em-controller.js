@@ -2,10 +2,7 @@ var app = angular.module("MIPS-app",[]);
 
 var editor = ace.edit("editor");
 editor.getSession().setMode("ace/mode/mips");
-editor.setValue("#Це просто кусок коментаря\n\
-addi $t1,$zero,20 #Тестовий коментар\n\
-#Ще один дивний коментар. Він такий няшка!\n\
-addi $t3,$zero,39");
+editor.setValue("#Тут буде ваш код");
 editor.gotoLine(0);
 
 app.config(function($interpolateProvider) {
