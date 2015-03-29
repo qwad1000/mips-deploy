@@ -273,7 +273,7 @@ function convertDTH(splitedCode) {
         + DexToFillBin(splitedCode[3], 5);
 }
 
-var commandRegExp = new RegExp("\s*,\s*");
+var commandRegExp = new RegExp("\\s*,\\s*");
 
 var numberRegExp = new RegExp("^-?(0x[0-9A-F]+|[0-9]+)");
 
