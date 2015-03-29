@@ -249,14 +249,12 @@ app.controller ("testController", function($scope, $http) {
             $scope.loadBtnText = "Assemble & Load to CPU";
             editor.setReadOnly(false);
             $scope.commandsCount = -1;
+            editor.session.clearBreakpoints();
             demoCPU.commandParser.commandHolder.clear();
         }
 
     };
     $scope.runConvert = function () {
-        /*for(var i=0; i<$scope.commandsCount; i++){
-         demoCPU.nextCommand();
-         }*/
         var i = 0;
         while (!demoCPU.isEnd() && i<$scope.limits.maxTicks){
             demoCPU.nextCommand();
