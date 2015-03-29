@@ -221,8 +221,8 @@ app.controller ("testController", function($scope, $http) {
             for (i=0;i<filtered_operations_list.length;i++){
                 value = filtered_operations_list[i].trim();
                 if (!verificate(value,demoCPU.commandParser.commandHolder)){
-                    alert("У вас помилка. Рядок №"+$scope.bindMap[i+1]);
-                    console.log(i+1);
+                    alert("У вас помилка. Рядок №"+$scope.bindMap[i]);
+                    console.log(i);
                     demoCPU.commandParser.commandHolder.clear();
                     isVerificated = false;
                     break;
