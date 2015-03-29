@@ -221,7 +221,7 @@ app.controller ("testController", function($scope, $http) {
             for (i=0;i<filtered_operations_list.length;i++){
                 value = filtered_operations_list[i].trim();
                 if (!verificate(value,demoCPU.commandParser.commandHolder)){
-                    alert("У вас помилка. Рядок №"+$scope.bindMap[i]);
+                    alert("An error in row №" + ($scope.bindMap[i]+1) );
                     console.log(i);
                     demoCPU.commandParser.commandHolder.clear();
                     isVerificated = false;
@@ -263,7 +263,7 @@ app.controller ("testController", function($scope, $http) {
             i++;
         }
         if (i==$scope.limits.maxTicks){
-            alert("Забагато ітерацій. Збільшіть ліміт");
+            alert("Too many iterations. You can set higher limit or look up for optimisation problems in your code.");
         }
         $scope.commandsCount = 0;
         console.log("состояние регистров под конец работы:");
@@ -276,9 +276,6 @@ app.controller ("testController", function($scope, $http) {
             var previousRegistersMap = angular.copy($scope.registers);
             demoCPU.nextCommand();
 
-            //$("#mips-register-r" + 15).css("background-color", "blue");
-            //$("#mips-register-r" + 15).addClass("danger");
-
             for(var i=0; i<previousRegistersMap.length; i++){
                 if(previousRegistersMap[i] == $scope.registers[i]){
                     $("#mips-register-r" + i).removeClass("danger");
@@ -288,11 +285,9 @@ app.controller ("testController", function($scope, $http) {
             }
 
             editor.session.clearBreakpoints();
-            //var rows = editor.session.getLength(); //fixme: indexes may be wrong if delete empty rows in editor
             editor.session.setBreakpoint($scope.bindMap[$scope.realCommandsCount - $scope.commandsCount]);
             $scope.commandsCount--;
             console.log(demoCPU.commandParser.commandHolder.PC);
-            //console.log($scope.programCounter);
         }
     };
     $scope.reset = function (){//todo
