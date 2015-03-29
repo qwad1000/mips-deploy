@@ -273,7 +273,7 @@ function convertDTH(splitedCode) {
         + DexToFillBin(splitedCode[3], 5);
 }
 
-var commandRegExp = new RegExp(",");
+var commandRegExp = new RegExp("\s*,\s*");
 
 var numberRegExp = new RegExp("^-?(0x[0-9A-F]+|[0-9]+)");
 
@@ -296,8 +296,10 @@ function initCommandParser() {
         console.log(code);
         //Код команди виглядає так:
         //addi $t1,$t2,$t3
-        var firstSpilt = code.split(" ");
-        var end = [firstSpilt[0]].concat(firstSpilt[1].split(commandRegExp));
+        //var firstSpilt = code.split(" ");
+        var firstSpaceIndex = code.indexOf(" ");
+        var firstSplit = [code.substring(0,firstSpaceIndex),code.substring(firstSpaceIndex+1)];
+        var end = [firstSplit[0]].concat(firstSplit[1].split(commandRegExp));
         console.log(code);
         return end;
     };
@@ -774,7 +776,8 @@ function verificate(line,commandRamHolder){
     if (line.indexOf(":") > -1){
         line = line.split(":")[1];
     }
-    var firstSplit = line.split(" ");
+    var firstSpaceIndex = line.indexOf(" ");
+    var firstSplit = [line.substring(0,firstSpaceIndex),line.substring(firstSpaceIndex+1)];
     if (firstSplit.length!=2){
         return false;
     }
