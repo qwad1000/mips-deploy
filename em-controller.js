@@ -2,7 +2,7 @@ var app = angular.module("MIPS-app",[]);
 
 var editor = ace.edit("editor");
 editor.getSession().setMode("ace/mode/mips");
-editor.setValue("#Тут буде ваш код");
+editor.setValue("#Якщо завдання не завантажилося - обновіть сторінку");
 editor.gotoLine(0);
 
 app.config(function($interpolateProvider) {

@@ -575,10 +575,8 @@ function initAccArray() {
         var mult = DexToFillComplementBin(s * t, 64);
         var mult1 = mult.substring(0, 32);
         var mult2 = mult.substring(32);
-        alu.lo = BinToDex(mult2);
-        alu.hi = BinToDex(mult1);
-        console.log(alu.lo);
-        console.log("Множення");
+        alu.lo = ComplementBinToDex(mult2);
+        alu.hi = ComplementBinToDex(mult1);
     };
     //multu
     arr['011010'] = function (b, registerHolder, alu) {
