@@ -191,7 +191,7 @@ app.controller ("testController", function($scope, $http) {
                 prepareMemoryTable($scope.memoryShift,
                     memoryTableSize.height, memoryTableSize.width);
         }else{
-            alert("Memory shift must be positive integer");
+            $scope.alert("Memory shift must be positive integer");
         }
     };
 
@@ -232,7 +232,7 @@ app.controller ("testController", function($scope, $http) {
             for (i=0; i<filtered_operations_list.length; i++){
                 value = filtered_operations_list[i].trim();
                 if (!verificate(value,demoCPU.commandParser.commandHolder)){
-                    alert("An error in row №" + ($scope.bindMap[i]+1) );
+                    $scope.alert("An error in row №" + ($scope.bindMap[i]+1) );
                     console.log(i);
                     demoCPU.commandParser.commandHolder.clear();
                     isVerificated = false;
@@ -273,7 +273,7 @@ app.controller ("testController", function($scope, $http) {
             i++;
         }
         if (i==$scope.limits.maxTicks){
-            alert("Too many iterations. You can set higher limit or look up for optimisation problems in your code.");
+            $scope.alert("Too many iterations. You can set higher limit or look up for optimisation problems in your code.");
         }
         $scope.commandsCount = 0;
         console.log("состояние регистров под конец работы:");
@@ -282,24 +282,6 @@ app.controller ("testController", function($scope, $http) {
     };
 
     $scope.runStep = function () {
-        /*if($scope.commandsCount>0){
-            var previousRegistersMap = angular.copy($scope.registers);
-            demoCPU.nextCommand();
-
-            for(var i=0; i<previousRegistersMap.length; i++){
-                if(previousRegistersMap[i] == $scope.registers[i]){
-                    $("#mips-register-r" + i).removeClass("danger");
-                }else{
-                    $("#mips-register-r" + i).addClass("danger");
-                }
-            }
-
-            editor.session.clearBreakpoints();
-            editor.session.setBreakpoint($scope.bindMap[$scope.realCommandsCount - $scope.commandsCount]);
-            $scope.commandsCount--;
-            console.log(demoCPU.commandParser.commandHolder.PC);
-        }*/
-
         if(!demoCPU.isEnd()){ //todo: add static variable for iteration
             var previousRegistersMap = angular.copy($scope.registers);
             demoCPU.nextCommand();
@@ -323,7 +305,6 @@ app.controller ("testController", function($scope, $http) {
 
         resetRegistersHighlighting();
 
-        //$scope.programCounter = demoCPU.commandParser.commandHolder.PC;
         $scope.ram = demoCPU.ram;
         $scope.isEditing = true; //crunch;
         $scope.commandsCount = -1;
@@ -344,13 +325,13 @@ app.controller ("testController", function($scope, $http) {
         angular.forEach(test.registers.start, function (val, i, arr){
             var key = Object.keys(val)[0];
             var code = registerCode[key];
-            var val = val[key];
+            val = val[key];
             demoCPU.register.set(code, val);
         });
         if(test.memory.start != null){
             angular.forEach(test.memory.start, function (val, i, arr){
                 var address = Object.keys(val)[0];
-                var val = val[address];
+                val = val[address];
 
                 demoCPU.ram.setHexWord(address, val);
             });
@@ -363,7 +344,7 @@ app.controller ("testController", function($scope, $http) {
         angular.forEach(test.registers.end, function (val, i, arr) {
             var key = Object.keys(val)[0];
             var code = registerCode[key];
-            var val = val[key];
+            val = val[key];
             var currentVal = demoCPU.register.get(code);
             if(currentVal != val){
                 testPassed = false;
@@ -373,7 +354,7 @@ app.controller ("testController", function($scope, $http) {
         if(test.memory.end != null){
             angular.forEach(test.memory.end, function (val, i, key) {
                 var adress = Object.keys(val)[0];
-                var val = val[adress];
+                val = val[adress];
 
                 var currentVal = demoCPU.ram.getHexWord(adress);
                 if(currentVal != val){
@@ -383,5 +364,13 @@ app.controller ("testController", function($scope, $http) {
         }
 
         test.passed = testPassed;//todo
-    }
+    };
+
+
+
+    $scope.alert = function( alertString ){
+        $scope.resultArea += alertString + '\n';
+        alert(alertString);
+    };
+
 });
