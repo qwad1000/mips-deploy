@@ -2,7 +2,7 @@ var app = angular.module("MIPS-app",[]);
 
 var editor = ace.edit("editor");
 editor.getSession().setMode("ace/mode/mips");
-editor.setValue("#Якщо завдання не завантажилося - обновіть сторінку\nalkhdf\nakljsd");
+editor.setValue("#Якщо завдання не завантажилося - обновіть сторінку");
 editor.gotoLine(0);
 
 app.config(function($interpolateProvider) {
@@ -267,6 +267,8 @@ app.controller ("testController", function($scope, $http) {
 
     };
     $scope.runConvert = function () {
+        var previousRegistersMap = angular.copy($scope.registers);
+
         var i = 0;
         while (!demoCPU.isEnd() && i<$scope.limits.maxTicks){
             demoCPU.nextCommand();
@@ -275,6 +277,9 @@ app.controller ("testController", function($scope, $http) {
         if (i==$scope.limits.maxTicks){
             $scope.alert("Too many iterations. You can set higher limit or look up for optimisation problems in your code.");
         }
+
+        setRegistersHighlighting(previousRegistersMap, $scope.registers);
+
         $scope.commandsCount = 0;
         console.log("состояние регистров под конец работы:");
         console.log(demoCPU.register.registerMap);
@@ -286,13 +291,7 @@ app.controller ("testController", function($scope, $http) {
             var previousRegistersMap = angular.copy($scope.registers);
             demoCPU.nextCommand();
 
-            for(var i=0; i<previousRegistersMap.length; i++){
-                if(previousRegistersMap[i] == $scope.registers[i]){
-                    $("#mips-register-r" + i).removeClass("danger");
-                }else{
-                    $("#mips-register-r" + i).addClass("danger");
-                }
-            }
+            setRegistersHighlighting(previousRegistersMap, $scope.registers);
 
             editor.session.clearBreakpoints();
             editor.session.setBreakpoint($scope.bindMap[demoCPU.commandParser.commandHolder.PC]);
@@ -312,6 +311,16 @@ app.controller ("testController", function($scope, $http) {
         console.log('mips cpu reseted');
     };
 
+    function setRegistersHighlighting(previousRegistersMap, currentRegisters){
+        for(var i=0; i<previousRegistersMap.length; i++){
+            if(previousRegistersMap[i] == currentRegisters[i]){
+                $("#mips-register-r" + i).removeClass("danger");
+            }else{
+                $("#mips-register-r" + i).addClass("danger");
+            }
+        }
+    }
+
     function resetRegistersHighlighting(){
         for(var i=0; i<$scope.registers.length; i++){
             $("#mips-register-r" + i).removeClass("danger");
@@ -322,14 +331,14 @@ app.controller ("testController", function($scope, $http) {
         $scope.reset();
         var test = $scope.exercise.tests[id];
 
-        angular.forEach(test.registers.start, function (val, i, arr){
+        angular.forEach(test.registers.start, function (val){
             var key = Object.keys(val)[0];
             var code = registerCode[key];
             val = val[key];
             demoCPU.register.set(code, val);
         });
         if(test.memory.start != null){
-            angular.forEach(test.memory.start, function (val, i, arr){
+            angular.forEach(test.memory.start, function (val){
                 var address = Object.keys(val)[0];
                 val = val[address];
 
@@ -341,7 +350,7 @@ app.controller ("testController", function($scope, $http) {
 
         var testPassed = true;
 
-        angular.forEach(test.registers.end, function (val, i, arr) {
+        angular.forEach(test.registers.end, function (val) {
             var key = Object.keys(val)[0];
             var code = registerCode[key];
             val = val[key];
@@ -352,7 +361,7 @@ app.controller ("testController", function($scope, $http) {
         });
 
         if(test.memory.end != null){
-            angular.forEach(test.memory.end, function (val, i, key) {
+            angular.forEach(test.memory.end, function (val) {
                 var adress = Object.keys(val)[0];
                 val = val[adress];
 
