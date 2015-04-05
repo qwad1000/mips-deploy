@@ -2,7 +2,7 @@ var app = angular.module("MIPS-app",[]);
 
 var editor = ace.edit("editor");
 editor.getSession().setMode("ace/mode/mips");
-editor.setValue("#Якщо завдання не завантажилося - обновіть сторінку");
+editor.setValue("#Якщо завдання не завантажилося - обновіть сторінку\nalkhdf\nakljsd");
 editor.gotoLine(0);
 
 app.config(function($interpolateProvider) {
@@ -15,6 +15,10 @@ var someEDXFounder = {};
 
 function isNotCommentLine(line){
     return !line.startsWith("#") && line.length>0;
+}
+function isNotEmptyOrWhitespaceLine(line){
+    var trimmed = line.trim();
+    return trimmed.length > 0;
 }
 
 function clearFromLineInComments(line){
@@ -42,13 +46,12 @@ app.controller ("testController", function($scope, $http) {
     $scope.exerciseVar = 0;
     $scope.exercisePath = "vars0.json";
 
-
     $scope.hexRegFmt = 'hex';
     $scope.memoryShift = 0x12;
 
     $scope.commandsCount = -1;
     $scope.dividedRegisters = prepareRegistersTable(2, $scope.registers, $scope.registersName);
-    var memoryTableSize = {width: 8, height: 17};
+    var memoryTableSize = {width: 8, height: 18};
     $scope.memoryShifts = prepareMemoryTable($scope.memoryShift,memoryTableSize.height, memoryTableSize.width);
 
     //crunch
@@ -121,7 +124,7 @@ app.controller ("testController", function($scope, $http) {
             var newnewArr = [];
             for(var j=0; j<columns; j++){
                 var index = i+newlength*j;
-                var obj = {name:names[index], indx:index};
+                var obj = { name:names[index], indx:index };
                 newnewArr.push(obj);
             }
             newArr.push(newnewArr);
@@ -195,25 +198,29 @@ app.controller ("testController", function($scope, $http) {
     $scope.loadInfo = function (){
         if($scope.isEditing){
             $scope.codeArea = editor.getValue();
-            var filtered_operations_list = $scope.codeArea.split('\n').filter(isNotCommentLine).map(clearFromLineInComments);
+            var filtered_operations_list =
+                $scope.codeArea.split('\n')
+                    .filter(isNotCommentLine)
+                    .filter(isNotEmptyOrWhitespaceLine)
+                    .map(clearFromLineInComments);
+
             $scope.realCommandsCount = filtered_operations_list.length;
             var operations_list = $scope.codeArea.split('\n');
             $scope.commandsCount = 0;
-
 
             //Створення зв’язуючої мапи
             $scope.bindMap = [];
             var commandCounter = 0;
             for (var i=0;i<operations_list.length;i++){
-                if (isNotCommentLine(operations_list[i])){
+                var value = operations_list[i].trim();
+                if (value.length>0 && isNotCommentLine(value)){
                     $scope.bindMap[commandCounter] = i;
                     commandCounter++;
                 }
             }
 
-
             for (i=0;i<filtered_operations_list.length;i++){
-                var value = filtered_operations_list[i].trim();
+                value = filtered_operations_list[i].trim();
                 if (value.indexOf(":")>-1){
                     var splited = value.split(":");
                     filtered_operations_list[i] = splited[1];
@@ -222,7 +229,7 @@ app.controller ("testController", function($scope, $http) {
             }
             console.log($scope.bindMap);
             var isVerificated = true;
-            for (i=0;i<filtered_operations_list.length;i++){
+            for (i=0; i<filtered_operations_list.length; i++){
                 value = filtered_operations_list[i].trim();
                 if (!verificate(value,demoCPU.commandParser.commandHolder)){
                     alert("An error in row №" + ($scope.bindMap[i]+1) );
@@ -242,6 +249,7 @@ app.controller ("testController", function($scope, $http) {
                         $scope.resultArea += BinToViewBin(binResult) + "\n";
                     }
                 }
+
                 $scope.isEditing = false;
                 resetRegistersHighlighting();
                 $scope.loadBtnText = "Return to editor";
@@ -274,7 +282,7 @@ app.controller ("testController", function($scope, $http) {
     };
 
     $scope.runStep = function () {
-        if($scope.commandsCount>0){
+        /*if($scope.commandsCount>0){
             var previousRegistersMap = angular.copy($scope.registers);
             demoCPU.nextCommand();
 
@@ -290,6 +298,22 @@ app.controller ("testController", function($scope, $http) {
             editor.session.setBreakpoint($scope.bindMap[$scope.realCommandsCount - $scope.commandsCount]);
             $scope.commandsCount--;
             console.log(demoCPU.commandParser.commandHolder.PC);
+        }*/
+
+        if(!demoCPU.isEnd()){ //todo: add static variable for iteration
+            var previousRegistersMap = angular.copy($scope.registers);
+            demoCPU.nextCommand();
+
+            for(var i=0; i<previousRegistersMap.length; i++){
+                if(previousRegistersMap[i] == $scope.registers[i]){
+                    $("#mips-register-r" + i).removeClass("danger");
+                }else{
+                    $("#mips-register-r" + i).addClass("danger");
+                }
+            }
+
+            editor.session.clearBreakpoints();
+            editor.session.setBreakpoint($scope.bindMap[demoCPU.commandParser.commandHolder.PC]);
         }
     };
     $scope.reset = function (){//todo

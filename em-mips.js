@@ -770,7 +770,7 @@ function getSTImm(b) {
 
 
 //region Верифікація
-function verificate(line,commandRamHolder){
+function verificate(line, commandRamHolder){
     if (line.indexOf(":") > -1){
         line = line.split(":")[1];
     }

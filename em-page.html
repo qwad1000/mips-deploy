@@ -4,57 +4,58 @@
 <div ng-app="MIPS-app" ng-controller="testController">
     <div class="page-wrapper container-fluid">
         <div class="row main-part-wrapper no-gutters">
+            <!-- editor column -->
             <div class="col-sm-4 column panel-info">
                 <div class="panel-heading btn-group btn-group-sm btn-group-justified" role="group">
                     <a type="button" class="btn btn-success btn-sm" ng-click="loadInfo()">[$ loadBtnText $]</a>
                     <a type="button" class="btn btn-sm btn-info"
-                    data-toggle="collapse" data-target="#collapsePrefs"
-                    aria-expanded="false" aria-controls="collapsePrefs">
-                    <span class="glyphicon glyphicon-cog"></span>
-                </a>
-            </div>
-            <div class="collapse" id="collapsePrefs">
-                <div class="panel panel-default">
-                    <div class="panel-heading">Preferences</div>
-                    <table class="table table-hovered">
-                        <tr>
-                            <td>MAX TICKS</td>
-                            <td><input type="number" ng-model="limits.maxTicks"></td>
-                        </tr>
-                    </table>
+                       data-toggle="collapse" data-target="#collapsePrefs"
+                       aria-expanded="false" aria-controls="collapsePrefs">
+                        <span class="glyphicon glyphicon-cog"></span>
+                    </a>
                 </div>
-            </div>
-            <div class="editor-wrapper">
-                <div id="editor" class="code-editor" ng-model="codeArea"></div>
-            </div>
-            <div class="panel-footer">
-                <div class="btn-group btn-group-sm btn-group-justified" ng-hide="isEditing">
-                    <a type="button" class="btn btn-primary" ng-click="runConvert()" ng-disabled="commandsCount==0">
-                        <span class="glyphicon glyphicon-play"></span> Run
-                    </a>
-                    <a type="button" class="btn btn-default" ng-click="runStep()" ng-disabled="commandsCount==0">
-                        <span class="glyphicon glyphicon-step-forward"></span>
-                        Step
-                    </a>
-                    <a type="button" class="btn btn-danger" ng-click="reset()">
-                        <span class="glyphicon glyphicon-remove-sign"></span>
-                        Reset
-                    </a>
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
-                            Tests <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu" role="menu">
-                            <li ng-repeat="val in exercise.tests">
-                                <button class="btn" ng-click="testClick(val.id)">
-                                    <span class="glyphicon glyphicon-ok" ng-show="val.passed"></span>
-                                    <span class="glyphicon glyphicon-remove" ng-hide="val.passed || val.passed == undefined"></span>
-                                    [$val.title$]</button>
-                            </li>
-                        </ul>
+                <div class="collapse" id="collapsePrefs">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Preferences</div>
+                        <table class="table table-hovered">
+                            <tr>
+                                <td>MAX TICKS</td>
+                                <td><input type="number" ng-model="limits.maxTicks"></td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
-            </div>
+                <div class="editor-wrapper">
+                    <div id="editor" class="code-editor" ng-model="codeArea"></div>
+                </div>
+                <div class="panel-footer">
+                    <div class="btn-group btn-group-sm btn-group-justified" ng-hide="isEditing">
+                        <a type="button" class="btn btn-primary" ng-click="runConvert()" ng-disabled="commandsCount==0">
+                            <span class="glyphicon glyphicon-play"></span> Run
+                        </a>
+                        <a type="button" class="btn btn-default" ng-click="runStep()" ng-disabled="commandsCount==0">
+                            <span class="glyphicon glyphicon-step-forward"></span>
+                            Step
+                        </a>
+                        <a type="button" class="btn btn-danger" ng-click="reset()">
+                            <span class="glyphicon glyphicon-remove-sign"></span>
+                            Reset
+                        </a>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+                                Tests <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                                <li ng-repeat="val in exercise.tests">
+                                    <button class="btn" ng-click="testClick(val.id)">
+                                        <span class="glyphicon glyphicon-ok" ng-show="val.passed"></span>
+                                        <span class="glyphicon glyphicon-remove" ng-hide="val.passed || val.passed == undefined"></span>
+                                        [$val.title$]</button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- registers table column -->
@@ -62,38 +63,38 @@
                 <div class="table-wrapper">
                     <table class="table table-striped table-condensed table-hovered table-bordered">
                         <thead>
-                            <tr class="info table-header">
-                                <th>Name</th>
-                                <th>Value</th>
-                                <th>Name</th>
-                                <th>Value</th>
-                            </tr>
+                        <tr class="info table-header">
+                            <th>Name</th>
+                            <th>Value</th>
+                            <th>Name</th>
+                            <th>Value</th>
+                        </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td class="register-name-cell">PC</td>
-                                <td class="register-value-cell">[$ returnRegister('pc', hexRegFmt) $]</td>
-                                <td class="register-name-cell">?</td>
-                                <td class="register-value-cell">todo</td>
-                            </tr>
+                        <tr>
+                            <td class="register-name-cell">PC</td>
+                            <td class="register-value-cell">[$ returnRegister('pc', hexRegFmt) $]</td>
+                            <td class="register-name-cell">?</td>
+                            <td class="register-value-cell">todo</td>
+                        </tr>
 
-                            <tr ng-repeat="row in dividedRegisters track by $index">
-                                <td class="register-name-cell" >r[$ row[0].indx $]/[$ row[0].name $]</td>
-                                <td id="[$'mips-register-r'+row[0].indx$]"
-                                        class="register-value-cell">[$ returnRegister(row[0].indx, hexRegFmt) $]</td>
-                                <td class="register-name-cell">r[$ row[1].indx $]/[$ row[1].name $]</td>
-                                <td id="[$'mips-register-r'+row[1].indx$]"
-                                    class="register-value-cell">[$ returnRegister(row[1].indx, hexRegFmt) $]</td>
-                            </tr>
+                        <tr ng-repeat="row in dividedRegisters track by $index">
+                            <td class="register-name-cell" >r[$ row[0].indx $]/[$ row[0].name $]</td>
+                            <td id="[$'mips-register-r'+row[0].indx$]"
+                                class="register-value-cell">[$ returnRegister(row[0].indx, hexRegFmt) $]</td>
+                            <td class="register-name-cell">r[$ row[1].indx $]/[$ row[1].name $]</td>
+                            <td id="[$'mips-register-r'+row[1].indx$]"
+                                class="register-value-cell">[$ returnRegister(row[1].indx, hexRegFmt) $]</td>
+                        </tr>
 
-                            <tr>
-                                <td class="register-name-cell">alu.hi</td>
-                                <td id="mips-register-alu-hi"
-                                    class="register-value-cell"> [$ returnRegister('alu.hi', hexRegFmt) $]</td>
-                                <td class="register-name-cell">alu.lo</td>
-                                <td id="mips-register-alu-lo"
-                                    class="register-value-cell"> [$ returnRegister('alu.lo', hexRegFmt) $]</td>
-                            </tr>
+                        <tr>
+                            <td class="register-name-cell">alu.hi</td>
+                            <td id="mips-register-alu-hi"
+                                class="register-value-cell"> [$ returnRegister('alu.hi', hexRegFmt) $]</td>
+                            <td class="register-name-cell">alu.lo</td>
+                            <td id="mips-register-alu-lo"
+                                class="register-value-cell"> [$ returnRegister('alu.lo', hexRegFmt) $]</td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>
@@ -108,7 +109,7 @@
                         <span class="input-group-addon">
                             <input type="radio" name="number-type" value="hex" ng-model="hexRegFmt">
                             <span  role="tooltip" data-content="Hex values represent binary two's complement code"
-                            data-toggle="popover" data-placement="right" data-trigger="hover">Hex</span>
+                                   data-toggle="popover" data-placement="right" data-trigger="hover">Hex</span>
                         </span>
 
                     </div>
@@ -120,24 +121,24 @@
                 <div class="table-wrapper">
                     <table class="table table-striped table-condensed table-bordered">
                         <thead class="table-header">
-                            <tr>
-                                <th class="memory-empty">
+                        <tr>
+                            <th class="memory-empty">
                                     <span ng-show="ram.isClear()" class="glyphicon glyphicon-ban-circle"
-                                    data-toggle="tooltip" data-placement="bottom" title="Memory is empty"></span>
-                                </th>
-                                <th class="info" ng-repeat="num in [0,1,2,3,4,5,6,7]">
-                                    [$num$]
-                                </th>
-                            </tr>
+                                          data-toggle="tooltip" data-placement="bottom" title="Memory is empty"></span>
+                            </th>
+                            <th class="info" ng-repeat="num in [0,1,2,3,4,5,6,7]">
+                                [$num$]
+                            </th>
+                        </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="num in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]">
-                                <th class="info table-header">[$ "0x" + memoryShifts[num][0].toString(16) $]</th>
-                                <!--todo: 8 -> cols-->
-                                <td class="memory-cell" ng-repeat="inf in [0,1,2,3,4,5,6,7]">
-                                    [$ returnMemoryValue(memoryShifts[num][inf],hexRegFmt) $]
-                                </td>
-                            </tr>
+                        <tr ng-repeat="num in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]">
+                            <th class="info table-header">[$ "0x" + memoryShifts[num][0].toString(16) $]</th>
+                            <!--todo: 8 -> cols-->
+                            <td class="memory-cell" ng-repeat="inf in [0,1,2,3,4,5,6,7]">
+                                [$ returnMemoryValue(memoryShifts[num][inf],hexRegFmt) $]
+                            </td>
+                        </tr>
                         </tbody>
                     </table>
 
@@ -165,18 +166,19 @@
 </body>
 
 
+<!-- <link rel="stylesheet" type="text/css" href="lib-bootstrap.min.css"> -->
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<script src="lib-bootstrap.min.js"></script>
+<link rel="stylesheet" type="text/css" href="em-page.css">
+
 <script src="lib-angular.min.js"></script>
 <script src="lib-jquery.min.js"></script>
 <script src="lib-ace.js"></script>
 <script src="lib-ace-config.js"></script>
 
-<!-- <link rel="stylesheet" type="text/css" href="lib-bootstrap.min.css"> -->
-<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-<script src="lib-bootstrap.min.js"></script>
-
 <script src="em-mips.js"></script>
 <script src="em-constants.js"></script>
 <script src="em-utility.js"></script>
 
-<link rel="stylesheet" type="text/css" href="em-page.css">
+
 <script src="em-controller.js"></script>
