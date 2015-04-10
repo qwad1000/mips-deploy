@@ -508,12 +508,12 @@ function initZeroStartArray() {
     arr["101010"] = function (b, registerHolder) {
         var values = getDST(b);
         registerHolder.set(values[0],
-            registerHolder.get(values[1]) < registerHolder.get(values[2] ? 1 : 0));
+            registerHolder.get(values[1]) < registerHolder.get(values[2]) ? 1 : 0);
     };
     //sltu
     arr["101011"] = function (b, registerHolder) {
         var values = getDST(b);
-        registerHolder.set(values[0], registerHolder.get(values[1]) < registerHolder.get(values[2] ? 1 : 0));
+        registerHolder.set(values[0], registerHolder.get(values[1]) < registerHolder.get(values[2]) ? 1 : 0);
     };
     //sub
     arr["100010"] = function (b, registerHolder) {
@@ -774,6 +774,9 @@ function verificate(line, commandRamHolder){
     if (line.indexOf(":") > -1){
         line = line.split(":")[1];
     }
+    if (line.indexOf(",")==-1){
+        return false;
+    }
     var firstSpaceIndex = line.indexOf(" ");
     var firstSplit = [line.substring(0,firstSpaceIndex),line.substring(firstSpaceIndex+1)];
     if (firstSplit.length!=2){
@@ -888,6 +891,9 @@ function _isBigLabel(n,commandRamHolder){
 
 //TSImmGroup = ['addi','addiu','andi','ori','slti','sltiu','xori']
 function verifyTSImm(splitedCode) {
+    if (splitedCode.length<4){
+        return false;
+    }
     var imm = parseInt(splitedCode[3]);
     return getRegisterCode(splitedCode[2]) != undefined &&
         getRegisterCode(splitedCode[1]) != undefined &&
@@ -895,22 +901,34 @@ function verifyTSImm(splitedCode) {
 }
 //DSTGroup = ['add','addu','and','or','sllv','slt','sltu','srlv','sub','subu','xor']
 function verifyDST(splitedCode) {
+    if (splitedCode.length<4){
+        return false;
+    }
     return getRegisterCode(splitedCode[2]) != undefined &&
         getRegisterCode(splitedCode[3]) != undefined &&
         getRegisterCode(splitedCode[1]) != undefined;
 }
 //SOffGroup = ['bgez','bgezal','bgtz','blez','bltz','bltzal']
 function verifySOff(splitedCode,commandRamHolder) {
+    if (splitedCode.length<3){
+        return false;
+    }
     return getRegisterCode(splitedCode[1]) != undefined &&
         + _isLabel(splitedCode[2],commandRamHolder);
 }
 //STGroup = ['div','divu','mult','multu']
 function verifyST(splitedCode) {
+    if (splitedCode.length<3){
+        return false;
+    }
     return getRegisterCode(splitedCode[1]) != undefined &&
         getRegisterCode(splitedCode[2]) != undefined;
 }
 //STOffGroup = ['beq','bne']
 function verifySTOff(splitedCode,commandRamHolder) {
+    if (splitedCode.length<4){
+        return false;
+    }
     return getRegisterCode(splitedCode[1]) != undefined &&
         + getRegisterCode(splitedCode[2]) != undefined &&
         + _isLabel(splitedCode[3],commandRamHolder);
@@ -918,11 +936,17 @@ function verifySTOff(splitedCode,commandRamHolder) {
 
 //TargetGroup=['j','jal']
 function verifyTarget(splitedCode,commandRamHolder) {
+    if (splitedCode.length<2){
+        return false;
+    }
     return _isBigLabel(splitedCode[1],commandRamHolder);
 }
 
 //TOffSGroup = ['lw','sw','lb','sb']
 function verifyTOffS(splitedCode) {
+    if (splitedCode.length<3){
+        return false;
+    }
     var offS = splitedCode[2];
     var offSArr = offS.split("(");
     offSArr[1] = offSArr[1].substring(0, offSArr[1].length - 1);
@@ -932,15 +956,24 @@ function verifyTOffS(splitedCode) {
 }
 //SorDGroup = ['mfhi','mflo','jr']
 function verifySorD(splitedCode) {
+    if (splitedCode.length<2){
+        return false;
+    }
     return getRegisterCode(splitedCode[1]) != undefined;
 }
 //TImmGroup = ['lui']
 function verifyTImm(splitedCode) {
+    if (splitedCode.length<3){
+        return false;
+    }
     return getRegisterCode(splitedCode[1]) != undefined &&
         + _isImmNumber(splitedCode[2]);
 }
 //commandDTHGroup = ['sll','sra','srl']
 function verifyDTH(splitedCode) {
+    if (splitedCode.length<4){
+        return false;
+    }
     return getRegisterCode(splitedCode[2]) != undefined&&
         getRegisterCode(splitedCode[1]) != undefined &&
         _isSmallImmNumber(splitedCode[3]);
