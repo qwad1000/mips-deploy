@@ -17,7 +17,7 @@
     /*float: inherit;*/
     font-size: .9em;
     font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
-    border: 1px #ddd;
+    /*border: 1px #ddd;*/
     /*border-radius:5px;*/
     height: 100%;
 }
@@ -39,9 +39,8 @@
 .editor-wrapper {
     height: 350px;
     width: 100%;
-    /*border-radius: 5px;*/
-    border-width: 1pt;
-    border-style: solid;
+    border-left: 1pt solid lightgray;
+    border-right: 1pt solid lightgray;
 }
 
 .bottom-row {
@@ -134,4 +133,9 @@
     padding: 0px;
     margin: 0px;
     max-width: 80%
+}
+
+.panel-footer{
+    padding-left: 3px;
+    padding-right: 3px;
 }

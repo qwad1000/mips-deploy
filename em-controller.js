@@ -50,6 +50,9 @@ app.controller ("testController", function($scope, $http) {
     $scope.memoryShift = 0x12;
 
     $scope.commandsCount = -1;
+
+    $scope.iterationCount = -1;
+
     $scope.dividedRegisters = prepareRegistersTable(2, $scope.registers, $scope.registersName);
     var memoryTableSize = {width: 8, height: 18};
     $scope.memoryShifts = prepareMemoryTable($scope.memoryShift,memoryTableSize.height, memoryTableSize.width);
@@ -64,8 +67,7 @@ app.controller ("testController", function($scope, $http) {
             //$scope.exercise = initialObject;
         });
 
-
-	someEDXFounder.getState = function () {
+    someEDXFounder.getState = function () {
 	    var jsonObject = {
 	        "code":editor.getValue(),
 	        "exVar": $scope.exerciseVar,
@@ -115,6 +117,9 @@ app.controller ("testController", function($scope, $http) {
 	    return JSON.stringify(jsonResult);
 	};
 
+    $scope.isEnd = function(){
+        return demoCPU.isEnd();
+    };
 
     function prepareRegistersTable(columns, arr, names){
         var newArr = [];
@@ -196,7 +201,7 @@ app.controller ("testController", function($scope, $http) {
     };
 
     $scope.loadInfo = function (){
-        if($scope.isEditing){
+        if($scope.isEditing) {
             $scope.codeArea = editor.getValue();
             var filtered_operations_list =
                 $scope.codeArea.split('\n')
@@ -251,6 +256,7 @@ app.controller ("testController", function($scope, $http) {
                 }
 
                 $scope.isEditing = false;
+                //$scope.iterationCount = 0;
                 resetRegistersHighlighting();
                 $scope.loadBtnText = "Return to editor";
                 editor.setReadOnly(true);
@@ -261,6 +267,7 @@ app.controller ("testController", function($scope, $http) {
             $scope.loadBtnText = "Assemble & Load to CPU";
             editor.setReadOnly(false);
             $scope.commandsCount = -1;
+            $scope.iterationCount = -1;
             editor.session.clearBreakpoints();
             demoCPU.commandParser.commandHolder.clear();
         }
@@ -281,12 +288,18 @@ app.controller ("testController", function($scope, $http) {
         setRegistersHighlighting(previousRegistersMap, $scope.registers);
 
         $scope.commandsCount = 0;
+        $scope.iterationCount = -1;
         console.log("состояние регистров под конец работы:");
         console.log(demoCPU.register.registerMap);
         console.log(demoCPU.ram.ramMap);
     };
 
     $scope.runStep = function () {
+        if($scope.iterationCount == -1){
+            $scope.iterationCount++;
+            editor.session.setBreakpoint($scope.bindMap[demoCPU.commandParser.commandHolder.PC]);
+            return;
+        }
         if(!demoCPU.isEnd()){ //todo: add static variable for iteration
             var previousRegistersMap = angular.copy($scope.registers);
             demoCPU.nextCommand();
@@ -297,6 +310,7 @@ app.controller ("testController", function($scope, $http) {
             editor.session.setBreakpoint($scope.bindMap[demoCPU.commandParser.commandHolder.PC]);
         }
     };
+
     $scope.reset = function (){//todo
         demoCPU = initDemoCPU();
         editor.session.clearBreakpoints();
@@ -306,7 +320,8 @@ app.controller ("testController", function($scope, $http) {
 
         $scope.ram = demoCPU.ram;
         $scope.isEditing = true; //crunch;
-        $scope.commandsCount = -1;
+        //$scope.commandsCount = -1;
+        $scope.iterationCount = -1;
         $scope.loadInfo();
         console.log('mips cpu reseted');
     };
@@ -327,10 +342,12 @@ app.controller ("testController", function($scope, $http) {
         }
     }
 
-    $scope.testClick = function (id){
+    $scope.setStartTestValues = function(id){
         $scope.reset();
-        var test = $scope.exercise.tests[id];
 
+        var previousRegistersMap = angular.copy($scope.registers);
+
+        var test = $scope.exercise.tests[id];
         angular.forEach(test.registers.start, function (val){
             var key = Object.keys(val)[0];
             var code = registerCode[key];
@@ -346,8 +363,16 @@ app.controller ("testController", function($scope, $http) {
             });
         }
 
+        setRegistersHighlighting(previousRegistersMap, $scope.registers);
+    };
+
+    $scope.testClick = function (id){
+        $scope.reset();
+        $scope.setStartTestValues(id);
+
         $scope.runConvert();
 
+        var test = $scope.exercise.tests[id];
         var testPassed = true;
 
         angular.forEach(test.registers.end, function (val) {
@@ -374,9 +399,7 @@ app.controller ("testController", function($scope, $http) {
 
         test.passed = testPassed;//todo
     };
-
-
-
+    
     $scope.alert = function( alertString ){
         $scope.resultArea += alertString + '\n';
         alert(alertString);

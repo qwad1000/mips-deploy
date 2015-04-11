@@ -32,27 +32,46 @@
 
                 <div class="panel-footer">
                     <div class="btn-group btn-group-sm btn-group-justified" ng-hide="isEditing">
-                        <a type="button" class="btn btn-primary" ng-click="runConvert()" ng-disabled="commandsCount==0">
+                        <a type="button" class="btn btn-primary" ng-click="runConvert()" ng-disabled="isEnd()">
                             <span class="glyphicon glyphicon-play"></span> Run
                         </a>
-                        <a type="button" class="btn btn-default" ng-click="runStep()" ng-disabled="commandsCount==0">
+                        <a type="button" class="btn btn-default" ng-click="runStep()" ng-disabled="isEnd()">
                             <span class="glyphicon glyphicon-step-forward"></span>
                             Step
                         </a>
-                        <a type="button" class="btn btn-danger" ng-click="reset()">
-                            <span class="glyphicon glyphicon-remove-sign"></span>
-                            Reset
-                        </a>
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-danger dropdown-toggle"
+                                    data-toggle="dropdown" aria-expanded="false">
+                                <!--ng-click="reset()"-->
+                                <span class="glyphicon glyphicon-remove-sign"></span>
+                                Reset
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                                <li>
+                                    <a class="btn" ng-click="reset()">
+                                        Initial state
+                                    </a>
+                                </li>
+                                <li class="divider"></li>
+                                <li ng-repeat="val in exercise.tests">
+                                    <a class="btn" ng-click="setStartTestValues(val.id)">
+                                        [$val.title$] state
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                                 Tests <span class="caret"></span>
                             </button>
                             <ul class="dropdown-menu" role="menu">
                                 <li ng-repeat="val in exercise.tests">
-                                    <button class="btn" ng-click="testClick(val.id)">
+                                    <a class="btn" ng-click="testClick(val.id)">
                                         <span class="glyphicon glyphicon-ok" ng-show="val.passed"></span>
                                         <span class="glyphicon glyphicon-remove" ng-hide="val.passed || val.passed == undefined"></span>
-                                        [$val.title$]</button>
+                                        [$val.title$]
+                                    </a>
                                 </li>
                             </ul>
                         </div>
@@ -159,6 +178,8 @@
 
         <div class="row bottom-row no-gutters">
             <div class="col-sm-4">
+
+
                 <div class="well well-sm task">
                     [$exercise.task$]
                 </div>
@@ -176,7 +197,7 @@
 
 
 <!-- <link rel="stylesheet" type="text/css" href="lib-bootstrap.min.css"> -->
-<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="em-page.css">
 
 <script src="lib-angular.min.js"></script>
