@@ -19,15 +19,17 @@
                         <div class="panel-heading">Preferences</div>
                         <table class="table table-hovered">
                             <tr>
-                                <td>MAX TICKS</td>
+                                <td><small>MAX TICKS</small></td>
                                 <td><input type="number" ng-model="limits.maxTicks"></td>
                             </tr>
                         </table>
                     </div>
                 </div>
+
                 <div class="editor-wrapper">
                     <div id="editor" class="code-editor" ng-model="codeArea"></div>
                 </div>
+
                 <div class="panel-footer">
                     <div class="btn-group btn-group-sm btn-group-justified" ng-hide="isEditing">
                         <a type="button" class="btn btn-primary" ng-click="runConvert()" ng-disabled="commandsCount==0">
@@ -155,10 +157,17 @@
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-sm-4"> [$exercise.task$] </div>
+        <div class="row bottom-row no-gutters">
+            <div class="col-sm-4">
+                <div class="well well-sm task">
+                    [$exercise.task$]
+                </div>
+            </div>
             <div class="col-sm-8">
-                <textarea class="result-area" ng-model="resultArea"></textarea>
+                <!--<div  class="well well-sm">-->
+                    <textarea class="well well-sm result-area" ng-model="resultArea"></textarea>
+
+                <!--</div>-->
             </div>
         </div>
     </div>
@@ -168,11 +177,11 @@
 
 <!-- <link rel="stylesheet" type="text/css" href="lib-bootstrap.min.css"> -->
 <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-<script src="lib-bootstrap.min.js"></script>
 <link rel="stylesheet" type="text/css" href="em-page.css">
 
 <script src="lib-angular.min.js"></script>
 <script src="lib-jquery.min.js"></script>
+<script src="lib-bootstrap.min.js"></script>
 <script src="lib-ace.js"></script>
 <script src="lib-ace-config.js"></script>
 
