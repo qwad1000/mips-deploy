@@ -597,8 +597,9 @@ function initElseZeroArray(){
     var arr = [];
     //jr
     arr['001000'] = function (b,registerHolder, ramHolder, commandRamHolder){
-        var values = getST(b)/4;
-        commandRamHolder.PC = registerHolder.get(values[0]);
+        var values = getST(b);
+        var nextPC = registerHolder.get(values[0])/4; //todo: exit if error while div 4
+        commandRamHolder.PC = Math.floor(nextPC);
     };
     //srl
     arr['000010'] = function (b,registerHolder, ramHolder, commandRamHolder){
