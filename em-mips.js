@@ -298,7 +298,7 @@ function initCommandParser() {
         //addi $t1,$t2,$t3
         //var firstSpilt = code.split(" ");
         var firstSpaceIndex = code.indexOf(" ");
-        var firstSplit = [code.substring(0,firstSpaceIndex),code.substring(firstSpaceIndex+1)];
+        var firstSplit = [code.substring(0,firstSpaceIndex).trim(),code.substring(firstSpaceIndex+1).trim()];
         var end = [firstSplit[0]].concat(firstSplit[1].split(commandRegExp));
         console.log(code);
         return end;
@@ -597,8 +597,23 @@ function initElseZeroArray(){
     var arr = [];
     //jr
     arr['001000'] = function (b,registerHolder, ramHolder, commandRamHolder){
-        var values = getST(b);
+        var values = getST(b)/4;
         commandRamHolder.PC = registerHolder.get(values[0]);
+    };
+    //srl
+    arr['000010'] = function (b,registerHolder, ramHolder, commandRamHolder){
+        var values = getDTH(b);
+        registerHolder.set(values[0],registerHolder.get(values[1])>>values[2]);
+    };
+    //sra
+    arr['000011'] = function (b,registerHolder, ramHolder, commandRamHolder){
+        var values = getDTH(b);
+        registerHolder.set(values[0],registerHolder.get(values[1])>>values[2]);
+    };
+    //srlv
+    arr['000110'] = function (b,registerHolder, ramHolder, commandRamHolder){
+        var values = getDST(b);
+        registerHolder.set(values[0],registerHolder.get(values[2])>>registerHolder.get(values[1]));
     };
     return arr;
 }
@@ -720,7 +735,7 @@ function initHardArray() {
  * @returns {Number} target
  */
 function getTarget(b){
-    return BinToDex(b.substring(6));
+    return BinToDex(b.substring(6))+1;
 }
 
 /**
@@ -730,6 +745,10 @@ function getTarget(b){
  */
 function getDST(b) {
     return [BinToDex(b.substring(16, 21)), BinToDex(b.substring(6, 11)), BinToDex(b.substring(11, 16))];
+}
+
+function getDTH(b) {
+    return [BinToDex(b.substring(16, 21)), BinToDex(b.substring(11, 16)), BinToDex(b.substring(21, 26))];
 }
 
 /**
@@ -778,7 +797,7 @@ function verificate(line, commandRamHolder){
         return false;
     }*/
     var firstSpaceIndex = line.indexOf(" ");
-    var firstSplit = [line.substring(0,firstSpaceIndex),line.substring(firstSpaceIndex+1)];
+    var firstSplit = [line.substring(0,firstSpaceIndex).trim(),line.substring(firstSpaceIndex+1).trim()];
     if (firstSplit.length!=2){
         return false;
     }
@@ -869,6 +888,7 @@ function _isImmNumber(n){
 }
 
 function _isSmallImmNumber(n){
+    console.log(n);
     return !isNaN(n) && (n<16 && n> - 16);
 }
 
@@ -975,6 +995,7 @@ function verifyDTH(splitedCode) {
     if (splitedCode.length<4){
         return false;
     }
+    console.log(splitedCode);
     return getRegisterCode(splitedCode[2]) != undefined&&
         getRegisterCode(splitedCode[1]) != undefined &&
         _isSmallImmNumber(splitedCode[3]);
