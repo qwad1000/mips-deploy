@@ -774,15 +774,16 @@ function verificate(line, commandRamHolder){
     if (line.indexOf(":") > -1){
         line = line.split(":")[1];
     }
-    if (line.indexOf(",")==-1){
+    /*if (line.indexOf(",")==-1){
         return false;
-    }
+    }*/
     var firstSpaceIndex = line.indexOf(" ");
     var firstSplit = [line.substring(0,firstSpaceIndex),line.substring(firstSpaceIndex+1)];
     if (firstSplit.length!=2){
         return false;
     }
     var splitedCode = [firstSplit[0]].concat(firstSplit[1].split(commandRegExp));
+    console.log(splitedCode.length," - ",line);
     var code = splitedCode[0];
     switch (code) {
         //TImm Group
