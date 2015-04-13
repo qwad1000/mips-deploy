@@ -399,7 +399,14 @@ app.controller ("testController", function($scope, $http) {
 
         test.passed = testPassed;//todo
     };
-    
+
+    $scope.testAllClick = function () {
+        angular.forEach($scope.exercise.tests, function (test){
+            var testId = test.id;
+            $scope.testClick(testId);
+        });
+    };
+
     $scope.alert = function( alertString ){
         $scope.resultArea += alertString + '\n';
         alert(alertString);

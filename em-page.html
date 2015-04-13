@@ -66,6 +66,12 @@
                                 Tests <span class="caret"></span>
                             </button>
                             <ul class="dropdown-menu" role="menu">
+                                <li>
+                                    <a class="btn" ng-click="testAllClick()">
+                                        Perform all tests
+                                    </a>
+                                </li>
+                                <li class="divider"></li>
                                 <li ng-repeat="val in exercise.tests">
                                     <a class="btn" ng-click="testClick(val.id)">
                                         <span class="glyphicon glyphicon-ok" ng-show="val.passed"></span>
