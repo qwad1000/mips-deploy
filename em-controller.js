@@ -47,7 +47,7 @@ app.controller ("testController", function($scope, $http) {
     $scope.exercisePath = "vars0.json";
 
     $scope.hexRegFmt = 'hex';
-    $scope.memoryShift = 0x12;
+    $scope.memoryShift = 0;
 
     $scope.commandsCount = -1;
 
