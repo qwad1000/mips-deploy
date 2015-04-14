@@ -24,9 +24,9 @@ function isNotEmptyOrWhitespaceLine(line){
 function clearFromLineInComments(line){
     var sharpIndex = line.indexOf("#");
     if (sharpIndex>-1){
-        line = line.substring(0,sharpIndex).trim();
+        line = line.substring(0,sharpIndex);
     }
-    return line;
+    return line.trim();
 }
 
 app.controller ("testController", function($scope, $http) {
