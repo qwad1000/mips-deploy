@@ -25,7 +25,7 @@ ace.define('ace/mode/mips_highlight_rules', function(require, exports, module) {
     var ExampleHighlightRules = function() {
         var keywordMapper = this.createKeywordMapper({
             "keyword.operator": "add addi addiu addu and andi " +
-                "beq beqz beqzal bgtz bltz bltzal bne " +
+                "beq beqz beqzal bgtz bltz bltzal bne blez" +
                 "div divu j jal jr lb lui lw "+
                 "mfhi mflo mult multu noop or ori sb sll sllv slt sltu slti sltiu sra srl srlv sub subu sw xor xori"
         }, "text", true, " ");

@@ -202,7 +202,8 @@ cEnd = {
     'srlv': "00000000110",
     'sub': "00000100010",
     'subu': "00000100011",
-    'xor': "00000100110"
+    'xor': "00000100110",
+    'or': "00000100101"
 };
 
 cMiddle = {
@@ -410,6 +411,9 @@ numberSet = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
  * @return {Number}
  */
 function getRegisterCode(code) {
+    if (!code.startsWith("$")){
+        return undefined;
+    }
     var exsCode = code.substring(1);
     if (numberSet.indexOf(parseInt(exsCode[0])) == -1) {
         return registerCode[exsCode];
@@ -606,6 +610,11 @@ function initElseZeroArray(){
         var values = getDTH(b);
         registerHolder.set(values[0],registerHolder.get(values[1])>>values[2]);
     };
+    //sll
+    arr['000000'] = function (b,registerHolder, ramHolder, commandRamHolder){
+        var values = getDTH(b);
+        registerHolder.set(values[0],registerHolder.get(values[1])<<values[2]);
+    };
     //sra
     arr['000011'] = function (b,registerHolder, ramHolder, commandRamHolder){
         var values = getDTH(b);
@@ -615,6 +624,11 @@ function initElseZeroArray(){
     arr['000110'] = function (b,registerHolder, ramHolder, commandRamHolder){
         var values = getDST(b);
         registerHolder.set(values[0],registerHolder.get(values[2])>>registerHolder.get(values[1]));
+    };
+    //sllv
+    arr['000100'] = function (b,registerHolder, ramHolder, commandRamHolder){
+        var values = getDST(b);
+        registerHolder.set(values[0],registerHolder.get(values[2])<<registerHolder.get(values[1]));
     };
     return arr;
 }
@@ -794,9 +808,6 @@ function verificate(line, commandRamHolder){
     if (line.indexOf(":") > -1){
         line = line.split(":")[1];
     }
-    /*if (line.indexOf(",")==-1){
-        return false;
-    }*/
     var firstSpaceIndex = line.indexOf(" ");
     var firstSplit = [line.substring(0,firstSpaceIndex).trim(),line.substring(firstSpaceIndex+1).trim()];
     if (firstSplit.length!=2){
@@ -913,7 +924,7 @@ function _isBigLabel(n,commandRamHolder){
 
 //TSImmGroup = ['addi','addiu','andi','ori','slti','sltiu','xori']
 function verifyTSImm(splitedCode) {
-    if (splitedCode.length<4){
+    if (splitedCode.length!=4){
         return false;
     }
     var imm = parseInt(splitedCode[3]);
@@ -923,7 +934,7 @@ function verifyTSImm(splitedCode) {
 }
 //DSTGroup = ['add','addu','and','or','sllv','slt','sltu','srlv','sub','subu','xor']
 function verifyDST(splitedCode) {
-    if (splitedCode.length<4){
+    if (splitedCode.length!=4){
         return false;
     }
     return getRegisterCode(splitedCode[2]) != undefined &&
@@ -932,7 +943,7 @@ function verifyDST(splitedCode) {
 }
 //SOffGroup = ['bgez','bgezal','bgtz','blez','bltz','bltzal']
 function verifySOff(splitedCode,commandRamHolder) {
-    if (splitedCode.length<3){
+    if (splitedCode.length!=3){
         return false;
     }
     return getRegisterCode(splitedCode[1]) != undefined &&
@@ -940,7 +951,7 @@ function verifySOff(splitedCode,commandRamHolder) {
 }
 //STGroup = ['div','divu','mult','multu']
 function verifyST(splitedCode) {
-    if (splitedCode.length<3){
+    if (splitedCode.length!=3){
         return false;
     }
     return getRegisterCode(splitedCode[1]) != undefined &&
@@ -948,7 +959,7 @@ function verifyST(splitedCode) {
 }
 //STOffGroup = ['beq','bne']
 function verifySTOff(splitedCode,commandRamHolder) {
-    if (splitedCode.length<4){
+    if (splitedCode.length!=4){
         return false;
     }
     return getRegisterCode(splitedCode[1]) != undefined &&
@@ -958,7 +969,7 @@ function verifySTOff(splitedCode,commandRamHolder) {
 
 //TargetGroup=['j','jal']
 function verifyTarget(splitedCode,commandRamHolder) {
-    if (splitedCode.length<2){
+    if (splitedCode.length!=2){
         return false;
     }
     return _isBigLabel(splitedCode[1],commandRamHolder);
@@ -966,7 +977,7 @@ function verifyTarget(splitedCode,commandRamHolder) {
 
 //TOffSGroup = ['lw','sw','lb','sb']
 function verifyTOffS(splitedCode) {
-    if (splitedCode.length<3){
+    if (splitedCode.length!=3){
         return false;
     }
     var offS = splitedCode[2];
@@ -978,14 +989,14 @@ function verifyTOffS(splitedCode) {
 }
 //SorDGroup = ['mfhi','mflo','jr']
 function verifySorD(splitedCode) {
-    if (splitedCode.length<2){
+    if (splitedCode.length!=2){
         return false;
     }
     return getRegisterCode(splitedCode[1]) != undefined;
 }
 //TImmGroup = ['lui']
 function verifyTImm(splitedCode) {
-    if (splitedCode.length<3){
+    if (splitedCode.length!=3){
         return false;
     }
     return getRegisterCode(splitedCode[1]) != undefined &&
@@ -993,7 +1004,7 @@ function verifyTImm(splitedCode) {
 }
 //commandDTHGroup = ['sll','sra','srl']
 function verifyDTH(splitedCode) {
-    if (splitedCode.length<4){
+    if (splitedCode.length!=4){
         return false;
     }
     console.log(splitedCode);
