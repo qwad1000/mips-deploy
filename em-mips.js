@@ -87,7 +87,6 @@ function initCommandRamHolder() {
     };
     commandRamHolder.getCurrent = function () {
         var result = this.commandCodeList[this.PC];
-        this.PC++;
         return result;
     };
     commandRamHolder.setPC = function (newPC) {
@@ -343,7 +342,9 @@ function initCommandParser() {
                     var currentCommandNumber = this.commandHolder.commandCodeList.length;
                     var labelNumber = this.commandHolder.getLabel(offsetLabel);
                     var offset = labelNumber - currentCommandNumber;
-                    splitedCode[2] = parseInt(offset);
+                    splitedCode[2] = parseInt(offset) - 1;//Тому що збільшення PC відбувається постійной
+                } else {
+                    splitedCode[3] = parseInt(offsetLabel)-1;//Тому що збільшення PC відбувається постійной
                 }
                 return cStart[code] + convertSOff(splitedCode);
                 break;
@@ -362,8 +363,11 @@ function initCommandParser() {
                     currentCommandNumber = this.commandHolder.commandCodeList.length;
                     labelNumber = this.commandHolder.getLabel(offsetLabel);
                     offset = labelNumber - currentCommandNumber;
-                    splitedCode[3] = parseInt(offset);
+                    splitedCode[3] = parseInt(offset) -1;//Тому що збільшення PC відбувається постійной
+                } else {
+                    splitedCode[3] = parseInt(offsetLabel)-1;//Тому що збільшення PC відбувається постійной
                 }
+                console.log("Offset Label",offsetLabel);
                 return cStart[code] + convertSTOff(splitedCode);
                 break;
             //Target Group
@@ -431,6 +435,7 @@ function initDemoCPU() {
     demoCPU.alu = initALU(demoCPU.register, demoCPU.ram, demoCPU.commandParser.commandHolder);
     demoCPU.nextCommand = function () {
         this.alu.calculate(this.commandParser.commandHolder.getCurrent());
+        this.commandParser.commandHolder.PC++;
     };
     demoCPU.isEnd = function() {
         return this.commandParser.commandHolder.isEnd();
@@ -909,17 +914,19 @@ function _isBigImmNumber(n){
 }
 
 function _isLabel(n,commandRamHolder){
-    if (typeof n == "string"){
+    var number = parseInt(n);
+    if (isNaN(number)){
         return commandRamHolder.getLabel(n)!=undefined;
     }
-    return _isImmNumber(n);
+    return _isImmNumber(number);
 }
 
 function _isBigLabel(n,commandRamHolder){
-    if (typeof n == "string"){
+    var number = parseInt(n);
+    if (isNaN(number)){
         return commandRamHolder.getLabel(n)!=undefined;
     }
-    return _isBigImmNumber(n);
+    return _isBigImmNumber(number);
 }
 
 //TSImmGroup = ['addi','addiu','andi','ori','slti','sltiu','xori']

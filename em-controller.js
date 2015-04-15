@@ -218,7 +218,7 @@ app.controller ("testController", function($scope, $http) {
             for (var i=0;i<operations_list.length;i++){
                 var value = operations_list[i].trim();
                 if (value.indexOf(":")==value.length-1){
-                    demoCPU.commandParser.commandHolder.setLabel(value.substring(0,value.length-1),commandCounter-1);
+                    demoCPU.commandParser.commandHolder.setLabel(value.substring(0,value.length-1),commandCounter);
                 }
                 if (value.length>0 && isCommandLine(value)){
                     $scope.bindMap[commandCounter] = i;
@@ -232,7 +232,7 @@ app.controller ("testController", function($scope, $http) {
                 if (value.indexOf(":")>-1){
                     var splited = value.split(":");
                     filtered_operations_list[i] = splited[1];
-                    demoCPU.commandParser.commandHolder.setLabel(splited[0],i-1);
+                    demoCPU.commandParser.commandHolder.setLabel(splited[0],i);
                 }
             }
             console.log($scope.bindMap);
