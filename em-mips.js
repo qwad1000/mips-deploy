@@ -264,7 +264,7 @@ function convertSorD(splitedCode) {
 //TImmGroup = ['lui']
 function convertTImm(splitedCode) {
     return DexToFillBin(getRegisterCode(splitedCode[1]), 5)
-        + DexToFillComplementBin(splitedCode[2], 16);
+        + DexToFillComplementBin(parseInt(splitedCode[2]), 16);
 }
 //commandDTHGroup = ['sll','sra','srl']
 function convertDTH(splitedCode) {
