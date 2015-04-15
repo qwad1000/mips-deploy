@@ -13,12 +13,12 @@ app.config(function($interpolateProvider) {
 var someEDXFounder = {};
 
 
-function isNotCommentLine(line){
-    return !line.startsWith("#") && line.length>0;
-}
-function isNotEmptyOrWhitespaceLine(line){
-    var trimmed = line.trim();
-    return trimmed.length > 0;
+function isCommandLine(line){
+    if (line.startsWith("#") || line.trim().length==0){
+        return false;
+    }
+    return line.indexOf(":") != line.length - 1;
+
 }
 
 function clearFromLineInComments(line){
@@ -205,25 +205,28 @@ app.controller ("testController", function($scope, $http) {
             $scope.codeArea = editor.getValue();
             var filtered_operations_list =
                 $scope.codeArea.split('\n')
-                    .filter(isNotCommentLine)
-                    .filter(isNotEmptyOrWhitespaceLine)
+                    .filter(isCommandLine)
                     .map(clearFromLineInComments);
 
             $scope.realCommandsCount = filtered_operations_list.length;
             var operations_list = $scope.codeArea.split('\n');
             $scope.commandsCount = 0;
 
-            //Створення зв’язуючої мапи
+            //Створення зв’язуючої мапи та пошук міток без команд
             $scope.bindMap = [];
             var commandCounter = 0;
             for (var i=0;i<operations_list.length;i++){
                 var value = operations_list[i].trim();
-                if (value.length>0 && isNotCommentLine(value)){
+                if (value.indexOf(":")==value.length-1){
+                    demoCPU.commandParser.commandHolder.setLabel(value.substring(0,value.length-1),commandCounter-1);
+                }
+                if (value.length>0 && isCommandLine(value)){
                     $scope.bindMap[commandCounter] = i;
                     commandCounter++;
                 }
             }
 
+            //Розділення міток та команд
             for (i=0;i<filtered_operations_list.length;i++){
                 value = filtered_operations_list[i].trim();
                 if (value.indexOf(":")>-1){
