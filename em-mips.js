@@ -395,7 +395,7 @@ function initCommandParser() {
                 break;
             //TImm Group
             case 'lui':
-                return cStart[code] + convertTImm(splitedCode);
+                return cStart[code] + DexToFillBin(0,5) +  convertTImm(splitedCode);
                 break;
             //DTH Group
             case 'sll':
@@ -747,6 +747,13 @@ function initHardArray() {
             commandRamHolder.PC+=values[2];
         }
     };
+    //lui
+    arr['001111'] = function(b,registerHolder, ramHolder, commandRamHolder){
+        var values = getTImm(b);
+        var shiftedValue = values[1] * Math.pow(2, 16);
+        registerHolder.set(values[0], shiftedValue);
+
+    };
     return arr;
 }
 /**
@@ -803,7 +810,14 @@ function getST(b) {
 function getSTImm(b) {
     return [BinToDex(b.substring(6, 11)), BinToDex(b.substring(11, 16)), ComplementBinToDex(b.substring(16))];
 }
-
+/**
+ *
+ * @param b
+ * @returns {*[]} T,Imm
+ */
+function getTImm(b){
+    return [BinToDex(b.substring(11,16)), ComplementBinToDex(b.substring(16))]; //todo:  test if complement is needed
+}
 //endregion
 
 
@@ -901,7 +915,7 @@ function verificate(line, commandRamHolder){
 }
 
 function _isImmNumber(n){
-    return !isNaN(n) && (n<16385 && n> - 16385);
+    return !isNaN(n) && (n<16385 && n> - 16385); //todo: test contant value
 }
 
 function _isSmallImmNumber(n){
