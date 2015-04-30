@@ -300,7 +300,7 @@ app.controller ("testController", function($scope, $http) {
     $scope.runStep = function () {
         if($scope.iterationCount == -1){
             $scope.iterationCount++;
-            editor.session.setBreakpoint($scope.bindMap[demoCPU.commandParser.commandHolder.PC]);
+            setBreakpoint($scope.bindMap[demoCPU.commandParser.commandHolder.PC]);
             return;
         }
         if(!demoCPU.isEnd()){ //todo: add static variable for iteration
@@ -310,7 +310,9 @@ app.controller ("testController", function($scope, $http) {
             setRegistersHighlighting(previousRegistersMap, $scope.registers);
 
             editor.session.clearBreakpoints();
-            editor.session.setBreakpoint($scope.bindMap[demoCPU.commandParser.commandHolder.PC]);
+            var breakPointLine = $scope.bindMap[demoCPU.commandParser.commandHolder.PC];
+            setBreakpoint(breakPointLine);
+
         }
     };
 
@@ -342,6 +344,17 @@ app.controller ("testController", function($scope, $http) {
     function resetRegistersHighlighting(){
         for(var i=0; i<$scope.registers.length; i++){
             $("#mips-register-r" + i).removeClass("danger");
+        }
+    }
+
+    function setBreakpoint(breakPointLine){
+        editor.getSession().setBreakpoint(breakPointLine);
+        var firstVisibleRow = editor.getFirstVisibleRow();
+        var lastVisibleRow = editor.getLastVisibleRow();
+        if(breakPointLine < firstVisibleRow
+            || breakPointLine > lastVisibleRow){
+            editor.resize(true);
+            editor.scrollToLine(breakPointLine, true, false);
         }
     }
 
