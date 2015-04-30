@@ -628,12 +628,12 @@ function initElseZeroArray(){
     //srlv
     arr['000110'] = function (b,registerHolder, ramHolder, commandRamHolder){
         var values = getDST(b);
-        registerHolder.set(values[0],registerHolder.get(values[2])>>registerHolder.get(values[1]));
+        registerHolder.set(values[0],registerHolder.get(values[1])>>registerHolder.get(values[2]));
     };
     //sllv
     arr['000100'] = function (b,registerHolder, ramHolder, commandRamHolder){
         var values = getDST(b);
-        registerHolder.set(values[0],registerHolder.get(values[2])<<registerHolder.get(values[1]));
+        registerHolder.set(values[0],registerHolder.get(values[1])<<registerHolder.get(values[2]));
     };
     return arr;
 }
