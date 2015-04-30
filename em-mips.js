@@ -691,12 +691,12 @@ function initHardArray() {
     };
     //j
     arr['000010'] = function (b,registerHolder, ramHolder, commandRamHolder){
-        commandRamHolder.PC = getTarget(b);
+        commandRamHolder.PC = getTarget(b)-1; //crunch: -1 needed because of PC++ in demoCPU.nextCommand
     };
     //jal
     arr['000011'] = function (b,registerHolder, ramHolder, commandRamHolder){
         registerHolder.set(31,commandRamHolder.PC);
-        commandRamHolder.PC = getTarget(b);
+        commandRamHolder.PC = getTarget(b)-1;//crunch: -1 needed because of PC++ in demoCPU.nextCommand
     };
     //beq
     arr['000100'] = function (b,registerHolder, ramHolder, commandRamHolder){
@@ -762,7 +762,7 @@ function initHardArray() {
  * @returns {Number} target
  */
 function getTarget(b){
-    return BinToDex(b.substring(6))+1;
+    return BinToDex(b.substring(6));
 }
 
 /**
