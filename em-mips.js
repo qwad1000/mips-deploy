@@ -726,7 +726,7 @@ function initHardArray() {
     arr['000111'] = function (b,registerHolder, ramHolder, commandRamHolder){
         var values = getSTImm(b);
         console.log(registerHolder.registerMap);
-        if (registerHolder.get(values[0]) >= 0){
+        if (registerHolder.get(values[0]) > 0){
             commandRamHolder.PC +=values[2];
         }
     };
