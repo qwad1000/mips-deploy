@@ -86,8 +86,7 @@ function initCommandRamHolder() {
         this.commandCodeList.push(code);
     };
     commandRamHolder.getCurrent = function () {
-        var result = this.commandCodeList[this.PC];
-        return result;
+        return this.commandCodeList[this.PC];
     };
     commandRamHolder.setPC = function (newPC) {
         this.PC = newPC;
@@ -588,7 +587,7 @@ function initAccArray() {
         alu.hi = ComplementBinToDex(mult1);
     };
     //multu
-    arr['011010'] = function (b, registerHolder, alu) {
+    arr['011001'] = function (b, registerHolder, alu) {
         var values = getST(b);
         var s = registerHolder.get(values[0]);
         var t = registerHolder.get(values[1]);

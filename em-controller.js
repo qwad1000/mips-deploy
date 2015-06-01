@@ -312,7 +312,6 @@ app.controller ("testController", function($scope, $http) {
             editor.session.clearBreakpoints();
             var breakPointLine = $scope.bindMap[demoCPU.commandParser.commandHolder.PC];
             setBreakpoint(breakPointLine);
-
         }
     };
 
